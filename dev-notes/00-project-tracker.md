@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0-dev
 **Last Updated:** 2026-03-26
-**Current Phase:** Milestone 6 (Background Processing with Action Scheduler)
-**Overall Progress:** 71% (5/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅)
+**Current Phase:** Milestone 7 (Polish, Testing & Documentation)
+**Overall Progress:** 86% (6/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅)
 
 ---
 
@@ -37,6 +37,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] M3: Context_Builder with term/post context, loopback HTML fallback, prompt token replacement
 - [x] M4: Meta_Handler + Generator: generation pipeline, overwrite protection, validation, activity log
 - [x] M5: Term Manager, Post Manager, AJAX endpoints (generate/bulk/preview), admin.js handlers, settings page links
+- [x] M6: Batch_Processor class, Action Scheduler / WP-Cron integration, AJAX batch endpoints, Batch tab UI, batch delay setting
 
 ---
 
@@ -215,33 +216,35 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 
 ---
 
-### M6: Background Processing with Action Scheduler ⬜ (0%)
+### M6: Background Processing with Action Scheduler ✅ (100%)
 
 **Goal:** Large sites may have thousands of terms/posts. Bulk generation must run in the background.
 
-**Files to create:**
+**Files created:**
 - `includes/class-batch-processor.php` — Action Scheduler integration for bulk jobs
 
 **Tasks:**
-- [ ] Register Action Scheduler actions: `amm_process_batch_term`, `amm_process_batch_post`
-- [ ] Batch processor: accepts a list of term/post IDs, schedules individual generation jobs with 5-second intervals (respect API rate limits)
-- [ ] Track batch progress in a transient: total items, completed, failed, current status
-- [ ] Admin UI: "Generate All Missing" button triggers batch job, shows progress bar
-- [ ] Cancel batch: admin can stop a running batch
-- [ ] Rate limiting: configurable delay between API calls (default 5 seconds)
-- [ ] Error handling: if a single item fails, log it and continue with next
-- [ ] Batch completion: admin notice when batch finishes
-- [ ] Check if Action Scheduler is available (WooCommerce provides it); if not, fall back to WP-Cron with `wp_schedule_single_event()`
-- [ ] Run phpcs/phpcbf, fix all violations
-- [ ] Git commit: `feat: background batch processing via Action Scheduler`
+- [x] Register Action Scheduler actions: `amm_process_batch_term`, `amm_process_batch_post`
+- [x] Batch processor: accepts a list of term/post IDs, schedules individual generation jobs with 5-second intervals (respect API rate limits)
+- [x] Track batch progress in a transient: total items, completed, failed, current status
+- [x] Admin UI: "Generate All Missing" button triggers batch job, shows progress bar
+- [x] Cancel batch: admin can stop a running batch
+- [x] Rate limiting: configurable delay between API calls (default 5 seconds)
+- [x] Error handling: if a single item fails, log it and continue with next
+- [x] Batch completion: admin notice when batch finishes
+- [x] Check if Action Scheduler is available (WooCommerce provides it); if not, fall back to WP-Cron with `wp_schedule_single_event()`
+- [x] Run phpcs/phpcbf, fix all violations
+- [x] Git commit: `feat: background batch processing via Action Scheduler`
 
 **Completion criteria:**
-- Bulk generation runs in background without timing out
-- Progress tracking works in admin UI
-- Batch can be cancelled
-- Rate limiting prevents API throttling
-- Works with or without WooCommerce (Action Scheduler fallback to WP-Cron)
-- phpcs passes clean
+- ✅ Bulk generation runs in background without timing out
+- ✅ Progress tracking works in admin UI
+- ✅ Batch can be cancelled
+- ✅ Rate limiting prevents API throttling
+- ✅ Works with or without WooCommerce (Action Scheduler fallback to WP-Cron)
+- ✅ phpcs passes clean
+
+**Completed:** 2026-03-26 — All criteria met. Batch_Processor class, AJAX endpoints (amm_start_batch, amm_batch_progress, amm_cancel_batch), Batch tab UI with type selector, progress bar, and cancel button. Batch delay setting registered. Error log clean. phpcs clean.
 
 ---
 
