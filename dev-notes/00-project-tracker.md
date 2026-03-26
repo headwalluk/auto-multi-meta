@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0-dev
 **Last Updated:** 2026-03-26
-**Current Phase:** Milestone 5 (Admin UI — Manager Pages)
-**Overall Progress:** 57% (4/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅)
+**Current Phase:** Milestone 6 (Background Processing with Action Scheduler)
+**Overall Progress:** 71% (5/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅)
 
 ---
 
@@ -36,6 +36,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] M2: AI_Factory, Test Connection AJAX endpoint
 - [x] M3: Context_Builder with term/post context, loopback HTML fallback, prompt token replacement
 - [x] M4: Meta_Handler + Generator: generation pipeline, overwrite protection, validation, activity log
+- [x] M5: Term Manager, Post Manager, AJAX endpoints (generate/bulk/preview), admin.js handlers, settings page links
 
 ---
 
@@ -177,7 +178,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 
 ---
 
-### M5: Admin UI — Manager Pages ⬜ (0%)
+### M5: Admin UI — Manager Pages ✅ (100%)
 
 **Goal:** Admin interface to browse terms/posts, see which have descriptions, generate individually or in bulk.
 
@@ -189,26 +190,28 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - Update `admin-templates/settings-page.php` — Link Taxonomies/Post Types tabs to manager views
 
 **Tasks:**
-- [ ] Term Manager: list table with columns — Term Name, Taxonomy, Current Description, Status (✅/⚠️), Actions (Generate / View / Force Regenerate)
-- [ ] Post Manager: list table with columns — Title, Post Type, Current Description, Status (✅/⚠️), Actions
-- [ ] Filter by taxonomy / post type
-- [ ] Bulk action: "Generate Missing Descriptions" for selected items
-- [ ] Dry run mode: preview generated description before saving (AJAX call that returns preview without writing)
-- [ ] Individual "Generate" button per row (AJAX, updates row in-place)
-- [ ] Progress indicator for bulk operations
-- [ ] AJAX endpoints: `amm_generate_single`, `amm_generate_bulk`, `amm_preview`
-- [ ] Nonce verification on all AJAX handlers
-- [ ] Update admin.js with AJAX handlers for generate/preview/bulk actions
-- [ ] Run phpcs/phpcbf, fix all violations
-- [ ] Git commit: `feat: admin term and post manager with bulk generation`
+- [x] Term Manager: list table with columns — Term Name, Taxonomy, Current Description, Status (✅/⚠️), Actions (Generate / View / Force Regenerate)
+- [x] Post Manager: list table with columns — Title, Post Type, Current Description, Status (✅/⚠️), Actions
+- [x] Filter by taxonomy / post type
+- [x] Bulk action: "Generate Missing Descriptions" for selected items
+- [x] Dry run mode: preview generated description before saving (AJAX call that returns preview without writing)
+- [x] Individual "Generate" button per row (AJAX, updates row in-place)
+- [x] Progress indicator for bulk operations
+- [x] AJAX endpoints: `amm_generate_single`, `amm_generate_bulk`, `amm_preview`
+- [x] Nonce verification on all AJAX handlers
+- [x] Update admin.js with AJAX handlers for generate/preview/bulk actions
+- [x] Run phpcs/phpcbf, fix all violations
+- [x] Git commit: `feat: admin term and post manager with bulk generation`
 
 **Completion criteria:**
-- Term manager shows all terms across enabled taxonomies with status indicators
-- Post manager shows all posts across enabled post types with status indicators
-- Individual generate works via AJAX
-- Bulk generate works for selected items
-- Dry run preview shows description without saving
-- phpcs passes clean
+- ✅ Term manager shows all terms across enabled taxonomies with status indicators
+- ✅ Post manager shows all posts across enabled post types with status indicators
+- ✅ Individual generate works via AJAX
+- ✅ Bulk generate works for selected items
+- ✅ Dry run preview shows description without saving
+- ✅ phpcs passes clean
+
+**Completed:** 2026-03-26 — All criteria met. WP_List_Table-based manager pages render cleanly in browser. Taxonomy/post type filter dropdowns working. Bulk generate runs items sequentially via JS with progress indicators. Preview area with Save/Dismiss implemented. All AJAX endpoints registered with nonce verification. phpcs clean on all M5 files. No PHP errors in debug log.
 
 ---
 
