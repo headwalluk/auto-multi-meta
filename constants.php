@@ -55,6 +55,19 @@ define( 'AMM_CONTEXT_MAX_SAMPLE_TITLES', 10 );
 // Context builder — HTTP timeout (seconds) for loopback frontend fetch.
 define( 'AMM_CONTEXT_LOOPBACK_TIMEOUT', 5 );
 
+// Generation log — option key and max entries to retain.
+define( 'AMM_OPT_GENERATION_LOG', 'amm_generation_log' );
+define( 'AMM_GENERATION_LOG_MAX_ENTRIES', 100 );
+
+// Meta description length limits.
+// Target: 120–160 characters (used in prompt templates).
+// Hard minimum: 20 characters (catches empty / broken responses).
+// Hard maximum: 320 characters (rejects runaway responses).
+define( 'AMM_META_DESC_MIN_LENGTH', 20 );
+define( 'AMM_META_DESC_TARGET_MIN', 120 );
+define( 'AMM_META_DESC_TARGET_MAX', 160 );
+define( 'AMM_META_DESC_ABSOLUTE_MAX', 320 );
+
 // SEO plugin meta keys — terms.
 define( 'AMM_YOAST_TERM_META_KEY', 'wpseo_desc' );
 define( 'AMM_RANKMATH_TERM_META_KEY', 'rank_math_description' );
