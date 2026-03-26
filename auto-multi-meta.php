@@ -27,6 +27,7 @@ require_once AMM_DIR . 'includes/class-ai-openai.php';
 require_once AMM_DIR . 'includes/class-ai-anthropic.php';
 require_once AMM_DIR . 'includes/class-ai-openrouter.php';
 require_once AMM_DIR . 'includes/class-ai-factory.php';
+require_once AMM_DIR . 'includes/class-context-builder.php';
 require_once AMM_DIR . 'includes/class-admin-hooks.php';
 require_once AMM_DIR . 'includes/class-plugin.php';
 
