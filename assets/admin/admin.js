@@ -14,6 +14,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	initChecklistButtons();
 	initTestConnection();
 	initManagerPage();
+	initBatchPanel();
 } );
 
 /**
@@ -603,4 +604,259 @@ function initManagerPage() {
 
 		processNext( 0 );
 	} );
+}
+
+/**
+ * Initialises the background batch generation panel.
+ *
+ * Handles:
+ * - "Generate All Missing" button: starts a background batch via amm_start_batch AJAX
+ * - Progress bar and status text: polls amm_batch_progress every 3 seconds
+ * - "Cancel Batch" button: stops the running batch via amm_cancel_batch AJAX
+ * - Page-load check: if a batch is already running, shows progress automatically
+ */
+function initBatchPanel() {
+	const startBtn       = document.getElementById( 'amm-batch-start' );
+	const cancelBtn      = document.getElementById( 'amm-batch-cancel' );
+	const progressWrap   = document.getElementById( 'amm-batch-progress-wrap' );
+	const progressBar    = document.getElementById( 'amm-batch-bar' );
+	const statusEl       = document.getElementById( 'amm-batch-status' );
+	const batchTypeInput = document.getElementById( 'amm-batch-type' );
+
+	if ( ! startBtn ) {
+		return;
+	}
+
+	let pollInterval = null;
+
+	/**
+	 * Clears the progress polling interval.
+	 */
+	function clearPoll() {
+		if ( pollInterval ) {
+			clearInterval( pollInterval );
+			pollInterval = null;
+		}
+	}
+
+	/**
+	 * Shows or hides the progress bar area.
+	 *
+	 * @param {boolean} visible True to show, false to hide.
+	 */
+	function setProgressVisible( visible ) {
+		if ( progressWrap ) {
+			progressWrap.style.display = visible ? '' : 'none';
+		}
+	}
+
+	/**
+	 * Updates the batch panel UI based on a progress response object.
+	 *
+	 * @param {Object} data Progress object from amm_batch_progress or amm_start_batch.
+	 */
+	function updateProgress( data ) {
+		const status    = data.status || 'idle';
+		const total     = data.total || 0;
+		const completed = data.completed || 0;
+		const failed    = data.failed || 0;
+		const pct       = total > 0 ? Math.round( ( completed / total ) * 100 ) : 0;
+		let statusText  = '';
+
+		if ( progressBar ) {
+			progressBar.style.width = pct + '%';
+		}
+
+		if ( 'running' === status ) {
+			startBtn.disabled = true;
+			if ( cancelBtn ) {
+				cancelBtn.style.display = '';
+				cancelBtn.disabled      = false;
+				cancelBtn.textContent   = cancelBtn.dataset.label || 'Cancel Batch';
+			}
+
+			setProgressVisible( true );
+
+			statusText = ( ammAdmin.i18n.batchRunning || 'Processing %1$d of %2$d\u2026 (%3$d failed)' )
+				.replace( '%1$d', String( completed ) )
+				.replace( '%2$d', String( total ) )
+				.replace( '%3$d', String( failed ) );
+
+			if ( ! pollInterval ) {
+				startPolling();
+			}
+		} else if ( 'completed' === status ) {
+			const generated = completed - failed;
+
+			statusText = ( ammAdmin.i18n.batchComplete || 'Complete: %1$d of %2$d generated (%3$d failed).' )
+				.replace( '%1$d', String( generated ) )
+				.replace( '%2$d', String( total ) )
+				.replace( '%3$d', String( failed ) );
+
+			clearPoll();
+			startBtn.disabled = false;
+			if ( cancelBtn ) {
+				cancelBtn.style.display = 'none';
+			}
+		} else if ( 'cancelled' === status ) {
+			statusText = ( ammAdmin.i18n.batchCancelled || 'Cancelled after processing %1$d of %2$d items.' )
+				.replace( '%1$d', String( completed ) )
+				.replace( '%2$d', String( total ) );
+
+			clearPoll();
+			startBtn.disabled = false;
+			if ( cancelBtn ) {
+				cancelBtn.style.display = 'none';
+			}
+		} else {
+			// idle or unknown — ensure UI is in a resting state.
+			clearPoll();
+			startBtn.disabled = false;
+			if ( cancelBtn ) {
+				cancelBtn.style.display = 'none';
+			}
+
+			setProgressVisible( false );
+		}
+
+		if ( statusEl && statusText ) {
+			statusEl.textContent = statusText;
+		}
+	}
+
+	/**
+	 * Polls the current batch progress via AJAX.
+	 */
+	function pollProgress() {
+		const formData = new FormData();
+		formData.append( 'action', 'amm_batch_progress' );
+		formData.append( 'nonce', ammAdmin.nonce );
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( r ) => r.json() )
+			.then( ( data ) => {
+				if ( data.success ) {
+					updateProgress( data.data );
+				}
+			} )
+			.catch( () => {} );
+	}
+
+	/**
+	 * Starts the 3-second polling interval.
+	 */
+	function startPolling() {
+		clearPoll();
+		pollInterval = setInterval( pollProgress, 3000 );
+	}
+
+	// -----------------------------------------------------------------------
+	// Sync type select → hidden input
+	// -----------------------------------------------------------------------
+
+	const batchTypeSelect = document.getElementById( 'amm-batch-type-select' );
+
+	if ( batchTypeSelect && batchTypeInput ) {
+		batchTypeSelect.addEventListener( 'change', () => {
+			batchTypeInput.value = batchTypeSelect.value;
+		} );
+	}
+
+	// -----------------------------------------------------------------------
+	// Start batch button
+	// -----------------------------------------------------------------------
+
+	startBtn.addEventListener( 'click', () => {
+		const type = batchTypeInput ? batchTypeInput.value : 'all';
+
+		startBtn.disabled = true;
+		if ( cancelBtn ) {
+			cancelBtn.style.display = '';
+		}
+
+		setProgressVisible( true );
+
+		if ( progressBar ) {
+			progressBar.style.width = '0%';
+		}
+
+		if ( statusEl ) {
+			statusEl.textContent = ammAdmin.i18n.batchStarting || 'Starting\u2026';
+		}
+
+		const formData = new FormData();
+		formData.append( 'action', 'amm_start_batch' );
+		formData.append( 'nonce', ammAdmin.nonce );
+		formData.append( 'type', type );
+		formData.append( 'force', '0' );
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( r ) => r.json() )
+			.then( ( data ) => {
+				if ( data.success ) {
+					updateProgress( data.data );
+				} else {
+					const msg = ( data.data && data.data.message )
+						? data.data.message
+						: ( ammAdmin.i18n.batchFailed || 'Failed to start batch.' );
+
+					if ( statusEl ) {
+						statusEl.textContent = msg;
+					}
+
+					startBtn.disabled = false;
+					if ( cancelBtn ) {
+						cancelBtn.style.display = 'none';
+					}
+				}
+			} )
+			.catch( () => {
+				if ( statusEl ) {
+					statusEl.textContent = ammAdmin.i18n.batchFailed || 'Failed to start batch.';
+				}
+
+				startBtn.disabled = false;
+				if ( cancelBtn ) {
+					cancelBtn.style.display = 'none';
+				}
+			} );
+	} );
+
+	// -----------------------------------------------------------------------
+	// Cancel batch button
+	// -----------------------------------------------------------------------
+
+	if ( cancelBtn ) {
+		cancelBtn.dataset.label = cancelBtn.textContent;
+
+		cancelBtn.addEventListener( 'click', () => {
+			cancelBtn.disabled    = true;
+			cancelBtn.textContent = ammAdmin.i18n.batchCancelling || 'Cancelling\u2026';
+
+			const formData = new FormData();
+			formData.append( 'action', 'amm_cancel_batch' );
+			formData.append( 'nonce', ammAdmin.nonce );
+
+			fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+				.then( ( r ) => r.json() )
+				.then( ( data ) => {
+					cancelBtn.disabled    = false;
+					cancelBtn.textContent = cancelBtn.dataset.label || 'Cancel Batch';
+
+					if ( data.success ) {
+						updateProgress( data.data );
+					}
+				} )
+				.catch( () => {
+					cancelBtn.disabled    = false;
+					cancelBtn.textContent = cancelBtn.dataset.label || 'Cancel Batch';
+				} );
+		} );
+	}
+
+	// -----------------------------------------------------------------------
+	// Page-load check: resume UI if a batch is already running.
+	// -----------------------------------------------------------------------
+
+	pollProgress();
 }

@@ -156,6 +156,29 @@ $term_manager_url = admin_url( 'tools.php?page=amm-term-manager' );
 		</div>
 	</div>
 
+	<!-- Background batch generation panel -->
+	<div id="amm-batch-panel" class="amm-batch-panel">
+		<?php printf( '<input type="hidden" id="amm-batch-type" value="post" />' ); ?>
+		<div class="amm-batch-actions">
+			<?php
+			printf(
+				'<button type="button" id="amm-batch-start" class="button button-primary">%s</button>',
+				esc_html__( 'Generate All Missing', 'auto-multi-meta' )
+			);
+			printf(
+				'<button type="button" id="amm-batch-cancel" class="button" style="display:none;">%s</button>',
+				esc_html__( 'Cancel Batch', 'auto-multi-meta' )
+			);
+			?>
+		</div>
+		<div id="amm-batch-progress-wrap" class="amm-batch-progress-wrap" style="display:none;" aria-live="polite">
+			<div class="amm-batch-progress">
+				<?php printf( '<div id="amm-batch-bar" class="amm-batch-bar" style="width:0%%"></div>' ); ?>
+			</div>
+			<?php printf( '<p id="amm-batch-status" class="amm-batch-status"></p>' ); ?>
+		</div>
+	</div>
+
 	<!-- List table form -->
 	<form id="amm-post-manager-form" method="post">
 		<?php

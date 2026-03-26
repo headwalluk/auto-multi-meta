@@ -75,4 +75,22 @@ define( 'AMM_RANKMATH_TERM_META_KEY', 'rank_math_description' );
 // SEO plugin meta keys — posts.
 define( 'AMM_YOAST_POST_META_KEY', '_yoast_wpseo_metadesc' );
 define( 'AMM_RANKMATH_POST_META_KEY', 'rank_math_description' );
+
+// Batch processing — option key for configurable inter-item delay (seconds).
+define( 'AMM_OPT_BATCH_DELAY', 'amm_batch_delay' );
+define( 'AMM_DEFAULT_BATCH_DELAY', 5 );
+
+// Batch processing — transient key and TTL (24 hours).
+define( 'AMM_BATCH_TRANSIENT_KEY', 'amm_active_batch' );
+define( 'AMM_BATCH_TRANSIENT_TTL', 86400 );
+
+// Batch processing — Action Scheduler / WP-Cron hook names.
+define( 'AMM_BATCH_ACTION_TERM', 'amm_process_batch_term' );
+define( 'AMM_BATCH_ACTION_POST', 'amm_process_batch_post' );
+
+// Batch processing — Action Scheduler group name.
+define( 'AMM_BATCH_AS_GROUP', 'auto-multi-meta' );
+
+// Batch processing — option key for the completion admin notice.
+define( 'AMM_OPT_BATCH_NOTICE', 'amm_batch_notice' );
 // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound

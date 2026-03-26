@@ -26,6 +26,7 @@ $max_tokens         = (int) get_option( AMM_OPT_MAX_TOKENS, AMM_DEFAULT_MAX_TOKE
 $prompt_terms       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_TERMS, AMM_DEFAULT_PROMPT_TEMPLATE_TERMS );
 $prompt_posts       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_POSTS, AMM_DEFAULT_PROMPT_TEMPLATE_POSTS );
 $overwrite          = (bool) get_option( AMM_OPT_OVERWRITE_EXISTING, AMM_DEFAULT_OVERWRITE_EXISTING );
+$batch_delay        = (int) get_option( AMM_OPT_BATCH_DELAY, AMM_DEFAULT_BATCH_DELAY );
 
 $seo_labels = [
 	'yoast'    => __( 'Yoast SEO', 'auto-multi-meta' ),
@@ -73,6 +74,9 @@ $display_taxonomies  = array_filter(
 		</a>
 		<a href="#log" class="nav-tab" data-tab="log">
 			<?php esc_html_e( 'Log', 'auto-multi-meta' ); ?>
+		</a>
+		<a href="#batch" class="nav-tab" data-tab="batch">
+			<?php esc_html_e( 'Batch', 'auto-multi-meta' ); ?>
 		</a>
 	</nav>
 
@@ -361,6 +365,76 @@ $display_taxonomies  = array_filter(
 					<?php esc_html_e( 'Generation history and activity log will appear here in a future release.', 'auto-multi-meta' ); ?>
 				</p>
 			</div><!-- #log-panel -->
+
+			<!-- ===== Batch Tab ===== -->
+			<div id="batch-panel" class="amm-tab-panel" style="display:none;">
+				<h2><?php esc_html_e( 'Background Batch Processing', 'auto-multi-meta' ); ?></h2>
+				<p class="description">
+					<?php esc_html_e( 'Run a background job to generate meta descriptions for all items that are missing one. The job runs in the background via Action Scheduler (or WP-Cron as a fallback) — you can close this page and return later to check progress.', 'auto-multi-meta' ); ?>
+				</p>
+
+				<h3><?php esc_html_e( 'Rate Limiting', 'auto-multi-meta' ); ?></h3>
+				<table class="form-table" role="presentation">
+					<tbody>
+						<tr>
+							<th scope="row">
+								<label for="amm-batch-delay-input"><?php esc_html_e( 'Delay Between Requests', 'auto-multi-meta' ); ?></label>
+							</th>
+							<td>
+								<input
+									type="number"
+									name="<?php echo esc_attr( AMM_OPT_BATCH_DELAY ); ?>"
+									id="amm-batch-delay-input"
+									value="<?php echo esc_attr( (string) $batch_delay ); ?>"
+									class="small-text"
+									min="0"
+									max="60"
+									step="1"
+								/>
+								<?php esc_html_e( 'seconds', 'auto-multi-meta' ); ?>
+								<p class="description">
+									<?php esc_html_e( 'Pause between each AI API call to avoid rate limiting (0–60 seconds). Default: 5 seconds.', 'auto-multi-meta' ); ?>
+								</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<h3><?php esc_html_e( 'Generate All Missing', 'auto-multi-meta' ); ?></h3>
+				<p class="description">
+					<?php esc_html_e( 'Queues all enabled taxonomies and post types that are missing meta descriptions. Save your settings first if you have made changes above.', 'auto-multi-meta' ); ?>
+				</p>
+
+				<div class="amm-batch-controls">
+					<?php
+					printf(
+						'<select id="amm-batch-type-select" class="amm-batch-type-select"><option value="all">%s</option><option value="term">%s</option><option value="post">%s</option></select>',
+						esc_html__( 'Terms &amp; Posts', 'auto-multi-meta' ),
+						esc_html__( 'Terms only', 'auto-multi-meta' ),
+						esc_html__( 'Posts only', 'auto-multi-meta' )
+					);
+					?>
+					<input type="hidden" id="amm-batch-type" value="all" />
+					<?php
+					printf(
+						'<button type="button" id="amm-batch-start" class="button button-primary">%s</button>',
+						esc_html__( 'Generate All Missing', 'auto-multi-meta' )
+					);
+					printf(
+						'<button type="button" id="amm-batch-cancel" class="button button-secondary" style="display:none;">%s</button>',
+						esc_html__( 'Cancel Batch', 'auto-multi-meta' )
+					);
+					?>
+				</div>
+
+				<div id="amm-batch-progress-wrap" class="amm-batch-progress-wrap" style="display:none;">
+					<div class="amm-batch-bar-track">
+						<div id="amm-batch-bar" class="amm-batch-bar" style="width:0%;"></div>
+					</div>
+					<p id="amm-batch-status" class="amm-batch-status" aria-live="polite"></p>
+				</div>
+
+			</div><!-- #batch-panel -->
 
 		</div><!-- .amm-tab-content -->
 

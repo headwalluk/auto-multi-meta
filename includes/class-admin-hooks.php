@@ -63,10 +63,14 @@ class Admin_Hooks {
 		add_action( 'admin_init', [ $this->plugin->get_settings(), 'register' ] );
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_action( 'admin_notices', [ $this, 'display_batch_notice' ] );
 		add_action( 'wp_ajax_amm_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_amm_generate_single', [ $this, 'ajax_generate_single' ] );
 		add_action( 'wp_ajax_amm_generate_bulk', [ $this, 'ajax_generate_bulk' ] );
 		add_action( 'wp_ajax_amm_preview', [ $this, 'ajax_preview' ] );
+		add_action( 'wp_ajax_amm_start_batch', [ $this, 'ajax_start_batch' ] );
+		add_action( 'wp_ajax_amm_batch_progress', [ $this, 'ajax_batch_progress' ] );
+		add_action( 'wp_ajax_amm_cancel_batch', [ $this, 'ajax_cancel_batch' ] );
 	}
 
 	/**
@@ -145,16 +149,25 @@ class Admin_Hooks {
 				'termManagerUrl' => admin_url( 'tools.php?page=amm-term-manager' ),
 				'postManagerUrl' => admin_url( 'tools.php?page=amm-post-manager' ),
 				'i18n'           => [
-					'generating'    => __( 'Generating…', 'auto-multi-meta' ),
-					'previewing'    => __( 'Previewing…', 'auto-multi-meta' ),
-					'generate'      => __( 'Generate', 'auto-multi-meta' ),
-					'regenerate'    => __( 'Regenerate', 'auto-multi-meta' ),
-					'preview'       => __( 'Preview', 'auto-multi-meta' ),
+					'generating'      => __( 'Generating…', 'auto-multi-meta' ),
+					'previewing'      => __( 'Previewing…', 'auto-multi-meta' ),
+					'generate'        => __( 'Generate', 'auto-multi-meta' ),
+					'regenerate'      => __( 'Regenerate', 'auto-multi-meta' ),
+					'preview'         => __( 'Preview', 'auto-multi-meta' ),
 					/* translators: %1$d: current item number, %2$d: total items. */
-					'bulkProgress'  => __( 'Generating %1$d of %2$d…', 'auto-multi-meta' ),
+					'bulkProgress'    => __( 'Generating %1$d of %2$d…', 'auto-multi-meta' ),
 					/* translators: %1$d: generated count, %2$d: skipped count, %3$d: error count. */
-					'bulkComplete'  => __( '%1$d generated, %2$d skipped, %3$d errors.', 'auto-multi-meta' ),
-					'requestFailed' => __( 'Request failed. Please try again.', 'auto-multi-meta' ),
+					'bulkComplete'    => __( '%1$d generated, %2$d skipped, %3$d errors.', 'auto-multi-meta' ),
+					'requestFailed'   => __( 'Request failed. Please try again.', 'auto-multi-meta' ),
+					'batchStarting'   => __( 'Starting…', 'auto-multi-meta' ),
+					/* translators: %1$d: completed count, %2$d: total, %3$d: failed count. */
+					'batchRunning'    => __( 'Processing %1$d of %2$d… (%3$d failed)', 'auto-multi-meta' ),
+					/* translators: %1$d: generated count, %2$d: total, %3$d: failed count. */
+					'batchComplete'   => __( 'Complete: %1$d of %2$d generated (%3$d failed).', 'auto-multi-meta' ),
+					/* translators: %1$d: completed count, %2$d: total items. */
+					'batchCancelled'  => __( 'Cancelled after processing %1$d of %2$d items.', 'auto-multi-meta' ),
+					'batchFailed'     => __( 'Failed to start batch.', 'auto-multi-meta' ),
+					'batchCancelling' => __( 'Cancelling…', 'auto-multi-meta' ),
 				],
 			]
 		);
@@ -382,6 +395,125 @@ class Admin_Hooks {
 		}
 
 		wp_send_json_success( $result );
+	}
+
+	/**
+	 * AJAX handler: start a background batch generation job.
+	 *
+	 * Expected POST fields: nonce, type ('term'|'post'|'all'), force ('0'|'1').
+	 *
+	 * @return void
+	 */
+	public function ajax_start_batch(): void {
+		check_ajax_referer( 'amm_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
+		$raw_type = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : 'all';
+		$force    = isset( $_POST['force'] ) && '1' === $_POST['force'];
+		// phpcs:enable
+
+		$valid_types = [ 'term', 'post', 'all' ];
+		$type        = in_array( $raw_type, $valid_types, true ) ? $raw_type : 'all';
+
+		$result = $this->plugin->get_batch_processor()->start_batch( $type, $force );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		$progress = $this->plugin->get_batch_processor()->get_progress();
+		wp_send_json_success( $progress );
+	}
+
+	/**
+	 * AJAX handler: return the current batch progress summary.
+	 *
+	 * Expected POST fields: nonce.
+	 *
+	 * @return void
+	 */
+	public function ajax_batch_progress(): void {
+		check_ajax_referer( 'amm_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+		}
+
+		$progress = $this->plugin->get_batch_processor()->get_progress();
+		wp_send_json_success( $progress );
+	}
+
+	/**
+	 * AJAX handler: cancel a running batch job.
+	 *
+	 * Expected POST fields: nonce.
+	 *
+	 * @return void
+	 */
+	public function ajax_cancel_batch(): void {
+		check_ajax_referer( 'amm_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+		}
+
+		$this->plugin->get_batch_processor()->cancel_batch();
+		$progress = $this->plugin->get_batch_processor()->get_progress();
+		wp_send_json_success( $progress );
+	}
+
+	/**
+	 * Admin notice: displays a one-time completion notice after a batch finishes.
+	 *
+	 * Reads the AMM_OPT_BATCH_NOTICE option, renders a dismissible notice, then
+	 * deletes the option so it only shows once.
+	 *
+	 * @return void
+	 */
+	public function display_batch_notice(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$notice = get_option( AMM_OPT_BATCH_NOTICE );
+
+		if ( ! is_array( $notice ) ) {
+			return;
+		}
+
+		delete_option( AMM_OPT_BATCH_NOTICE );
+
+		$generated = (int) ( $notice['generated'] ?? 0 );
+		$failed    = (int) ( $notice['failed'] ?? 0 );
+		$total     = (int) ( $notice['total'] ?? 0 );
+		$type      = isset( $notice['type'] ) ? sanitize_key( $notice['type'] ) : 'all';
+
+		if ( 'term' === $type ) {
+			$type_label = __( 'terms', 'auto-multi-meta' );
+		} elseif ( 'post' === $type ) {
+			$type_label = __( 'posts', 'auto-multi-meta' );
+		} else {
+			$type_label = __( 'items', 'auto-multi-meta' );
+		}
+
+		$notice_class = $failed > 0 ? 'notice-warning' : 'notice-success';
+
+		printf(
+			'<div class="notice %s is-dismissible"><p>%s</p></div>',
+			esc_attr( $notice_class ),
+			sprintf(
+				/* translators: 1: generated count, 2: total count, 3: item type label, 4: failed count. */
+				esc_html__( 'Auto Multi-Meta batch complete: %1$d of %2$d %3$s generated. %4$d failed.', 'auto-multi-meta' ),
+				(int) $generated,
+				(int) $total,
+				esc_html( $type_label ),
+				(int) $failed
+			)
+		);
 	}
 
 	/**

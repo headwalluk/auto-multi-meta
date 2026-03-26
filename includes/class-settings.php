@@ -119,6 +119,15 @@ class Settings {
 				'default'           => [],
 			]
 		);
+
+		register_setting(
+			self::OPTION_GROUP,
+			AMM_OPT_BATCH_DELAY,
+			[
+				'sanitize_callback' => [ $this, 'sanitize_batch_delay' ],
+				'default'           => AMM_DEFAULT_BATCH_DELAY,
+			]
+		);
 	}
 
 	/**
@@ -215,6 +224,26 @@ class Settings {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Sanitises the batch delay in seconds.
+	 *
+	 * Clamps to a sensible range (0–60 seconds).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed $input Raw input value.
+	 * @return int
+	 */
+	public function sanitize_batch_delay( $input ): int {
+		$delay = absint( $input );
+
+		if ( $delay > 60 ) {
+			$delay = 60;
+		}
+
+		return $delay;
 	}
 
 	/**

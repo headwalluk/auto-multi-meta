@@ -60,6 +60,13 @@ class Plugin {
 	private ?Generator $generator = null;
 
 	/**
+	 * Batch_Processor instance (lazy-loaded).
+	 *
+	 * @var Batch_Processor|null
+	 */
+	private ?Batch_Processor $batch_processor = null;
+
+	/**
 	 * Private constructor — use get_instance().
 	 */
 	private function __construct() {}
@@ -93,6 +100,10 @@ class Plugin {
 	 */
 	public function init(): void {
 		load_plugin_textdomain( 'auto-multi-meta', false, AMM_DIR . 'languages' );
+
+		// Batch processor hooks must be registered on every request (not just admin)
+		// because Action Scheduler dispatches actions on any incoming WP request.
+		$this->get_batch_processor()->register();
 
 		if ( is_admin() ) {
 			$this->get_admin_hooks()->register();
@@ -165,6 +176,19 @@ class Plugin {
 		}
 
 		return $this->generator;
+	}
+
+	/**
+	 * Returns the Batch_Processor instance, creating it if needed.
+	 *
+	 * @return Batch_Processor
+	 */
+	public function get_batch_processor(): Batch_Processor {
+		if ( null === $this->batch_processor ) {
+			$this->batch_processor = new Batch_Processor( $this );
+		}
+
+		return $this->batch_processor;
 	}
 
 	/**

@@ -32,6 +32,7 @@ require_once AMM_DIR . 'includes/class-meta-handler.php';
 require_once AMM_DIR . 'includes/class-generator.php';
 require_once AMM_DIR . 'includes/class-term-manager.php';
 require_once AMM_DIR . 'includes/class-post-manager.php';
+require_once AMM_DIR . 'includes/class-batch-processor.php';
 require_once AMM_DIR . 'includes/class-admin-hooks.php';
 require_once AMM_DIR . 'includes/class-plugin.php';
 

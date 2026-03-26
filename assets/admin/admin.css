@@ -215,3 +215,53 @@
 .column-actions .button:last-child {
 	margin-right: 0;
 }
+
+/* ===================================================================
+   Manager Pages — Batch Panel
+   =================================================================== */
+
+.amm-batch-panel {
+	margin: 16px 0;
+	padding: 16px 20px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.amm-batch-actions,
+.amm-batch-controls {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0 0 16px;
+}
+
+.amm-batch-type-select {
+	min-width: 160px;
+}
+
+.amm-batch-progress-wrap {
+	margin-top: 12px;
+}
+
+.amm-batch-progress,
+.amm-batch-bar-track {
+	height: 8px;
+	background: #dcdcde;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 8px;
+}
+
+.amm-batch-bar {
+	height: 100%;
+	background: #2271b1;
+	border-radius: 4px;
+	transition: width 0.4s ease;
+}
+
+.amm-batch-status {
+	margin: 0;
+	font-size: 13px;
+	color: #50575e;
+}
