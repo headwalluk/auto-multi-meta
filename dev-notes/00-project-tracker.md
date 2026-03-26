@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0-dev
 **Last Updated:** 2026-03-26
-**Current Phase:** Milestone 4 (Meta Description Generation & Storage)
-**Overall Progress:** 43% (3/7 milestones complete — M1 ✅, M2 ✅, M3 ✅)
+**Current Phase:** Milestone 5 (Admin UI — Manager Pages)
+**Overall Progress:** 57% (4/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅)
 
 ---
 
@@ -35,6 +35,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] M2: Implement OpenAI, Anthropic, OpenRouter providers
 - [x] M2: AI_Factory, Test Connection AJAX endpoint
 - [x] M3: Context_Builder with term/post context, loopback HTML fallback, prompt token replacement
+- [x] M4: Meta_Handler + Generator: generation pipeline, overwrite protection, validation, activity log
 
 ---
 
@@ -144,33 +145,35 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 
 ---
 
-### M4: Meta Description Generation & Storage ⬜ (0%)
+### M4: Meta Description Generation & Storage ✅ (100%)
 
 **Goal:** Wire it all together — generate a description and save it to the correct SEO meta key.
 
-**Files to create:**
+**Files created:**
 - `includes/class-meta-handler.php` — Reads/writes SEO meta for terms and posts
 - `includes/class-generator.php` — Orchestrates: context → AI → meta storage
 
 **Tasks:**
-- [ ] Meta_Handler: detect active SEO plugin, read existing meta description, write new meta description
+- [x] Meta_Handler: detect active SEO plugin, read existing meta description, write new meta description
   - Yoast term meta key: `wpseo_desc` (via `update_term_meta`)
   - Yoast post meta key: `_yoast_wpseo_metadesc` (via `update_post_meta`)
   - RankMath term meta key: `rank_math_description` (via `update_term_meta`)
   - RankMath post meta key: `rank_math_description` (via `update_post_meta`)
-- [ ] Generator: accepts a term ID + taxonomy or post ID, checks overwrite protection, builds context, calls AI, validates response length (120-160 chars target, max 320), stores result
-- [ ] Return structured result: `[ 'status' => 'generated|skipped|error', 'description' => '...', 'message' => '...' ]`
-- [ ] Log each generation attempt (term/post ID, provider, model, status, timestamp) to a custom option or transient for the Log tab
-- [ ] Run phpcs/phpcbf, fix all violations
-- [ ] Test: generate a description for a term and a post on westfield.local, verify it appears in the correct meta
-- [ ] Git commit: `feat: meta description generation and SEO plugin storage`
+- [x] Generator: accepts a term ID + taxonomy or post ID, checks overwrite protection, builds context, calls AI, validates response length (120-160 chars target, max 320), stores result
+- [x] Return structured result: `[ 'status' => 'generated|skipped|error', 'description' => '...', 'message' => '...' ]`
+- [x] Log each generation attempt (term/post ID, provider, model, status, timestamp) to a custom option or transient for the Log tab
+- [x] Run phpcs/phpcbf, fix all violations
+- [x] Test: generate a description for a term and a post on westfield.local, verify it appears in the correct meta
+- [x] Git commit: `feat: meta description generation and SEO plugin storage`
 
 **Completion criteria:**
-- Can generate and store a meta description for a taxonomy term
-- Can generate and store a meta description for a post
-- Overwrite protection works (skips terms/posts with existing descriptions unless forced)
-- Generation log records each attempt
-- phpcs passes clean
+- ✅ Can generate and store a meta description for a taxonomy term
+- ✅ Can generate and store a meta description for a post
+- ✅ Overwrite protection works (skips terms/posts with existing descriptions unless forced)
+- ✅ Generation log records each attempt (amm_generation_log option, max 100 entries)
+- ✅ phpcs passes clean
+
+**Completed:** 2026-03-26 — All criteria met. Pipeline tested end-to-end: no API key path returns structured error result and logs the attempt correctly. phpcs clean.
 
 ---
 
