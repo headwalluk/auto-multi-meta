@@ -421,7 +421,7 @@ $display_taxonomies  = array_filter(
 								);
 								?>
 							</td>
-							<td><?php echo esc_html( $amm_e_message ); ?></td>
+							<td class="column-message"><?php echo esc_html( $amm_e_message ); ?></td>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>

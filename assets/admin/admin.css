@@ -274,32 +274,47 @@
 	table-layout: fixed;
 }
 
+/* border-box ensures declared widths include padding, preventing column overflow */
+.amm-log-table th,
 .amm-log-table td {
+	box-sizing: border-box;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 }
 
 .amm-log-table .column-timestamp {
-	width: 160px;
+	width: 140px;
 }
 
-.amm-log-table .column-type,
-.amm-log-table .column-id,
+.amm-log-table .column-type {
+	width: 70px;
+}
+
+.amm-log-table .column-id {
+	width: 50px;
+}
+
 .amm-log-table .column-provider {
-	width: 100px;
+	width: 80px;
 }
 
 .amm-log-table .column-status {
-	width: 90px;
+	width: 80px;
 }
 
 .amm-log-table .column-model {
-	width: 160px;
+	width: 120px;
 }
 
 .amm-log-table .column-model code {
 	font-size: 11px;
 	word-break: break-all;
+}
+
+.amm-log-table .column-message {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
 }
 
 .amm-status-badge {

@@ -261,9 +261,10 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] README.md: proper plugin description, installation, usage, screenshots placeholder
 - [x] CHANGELOG.md: v1.0.0 entry
 - [x] Update plugin header with correct version, description, author info
-- [ ] Full phpcs pass across all files
+- [x] Full phpcs pass across all files
 - [ ] Manual testing on westfield.local: activate, configure, generate for terms and posts
-- [ ] Git commit: `chore: v1.0.0 release preparation`
+- [x] Git commit: `chore: v1.0.0 release preparation`
+- [ ] Fix CSS overflow on Log tab activity table (column-message needs overflow-wrap/word-wrap)
 - [ ] Tag release: `git tag v1.0.0`
 
 **Completion criteria:**
