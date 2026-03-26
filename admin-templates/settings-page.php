@@ -333,6 +333,13 @@ printf( '</div>' );
 printf( '<div id="log-panel" class="amm-tab-panel" style="display:none;">' );
 printf( '<h2>%s</h2>', esc_html__( 'Activity Log', 'auto-multi-meta' ) );
 
+if ( ! empty( $auto_multi_meta_generation_log ) ) {
+	printf(
+		'<p><button type="button" id="amm-clear-log" class="button button-secondary">%s</button> <span id="amm-clear-log-result" style="display:none;"></span></p>',
+		esc_html__( 'Clear Log', 'auto-multi-meta' )
+	);
+}
+
 if ( empty( $auto_multi_meta_generation_log ) ) {
 	printf(
 		'<p class="description">%s</p>',

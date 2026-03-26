@@ -9,6 +9,7 @@
 | Model | Model name (e.g. `gpt-4o-mini`, `claude-3-haiku-20240307`) |
 | Max Tokens | Maximum tokens for the AI response (default: 300) |
 | Overwrite Existing | Whether to replace descriptions that already exist |
+| Site Language | When enabled, appends locale-aware spelling instructions to prompts (e.g. "Use United Kingdom English spelling") based on the WordPress site language |
 | Batch Delay | Seconds between API calls during bulk generation (default: 5) |
 
 ## AI Providers
@@ -23,18 +24,21 @@ OpenRouter is the cheapest option for testing — it provides access to many mod
 
 ## SEO Plugin Integration
 
-The plugin auto-detects Yoast SEO or RankMath and writes to the correct meta keys:
+The plugin auto-detects Yoast SEO, RankMath, or The SEO Framework and writes to the correct meta keys:
 
 | SEO Plugin | Term Meta Key | Post Meta Key |
 |------------|---------------|---------------|
 | Yoast SEO | `wpseo_desc` | `_yoast_wpseo_metadesc` |
 | RankMath | `rank_math_description` | `rank_math_description` |
+| The SEO Framework | `autodescription-term-settings` (serialized array, `description` key) | `_genesis_description` |
 
 If no supported SEO plugin is active, the plugin will display a warning and meta descriptions cannot be stored.
 
 ## Prompt Templates
 
 Separate templates for taxonomy terms and posts. Use tokens as placeholders that are replaced with real data at generation time.
+
+The default templates instruct the AI to output only plain text — no headings, labels, markdown, character counts, or quotes. If you customise the templates, it's recommended to keep a similar instruction to avoid formatting artifacts in the output.
 
 ### Term template tokens
 

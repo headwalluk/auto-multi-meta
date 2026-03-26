@@ -13,6 +13,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	initTabs();
 	initChecklistButtons();
 	initTestConnection();
+	initClearLog();
 	initManagerPage();
 	initBatchPanel();
 } );
@@ -184,6 +185,72 @@ function initTestConnection() {
 }
 
 /**
+ * Initialises the Clear Log button on the Activity Log tab.
+ */
+function initClearLog() {
+	const button   = document.getElementById( 'amm-clear-log' );
+	const resultEl = document.getElementById( 'amm-clear-log-result' );
+
+	if ( ! button ) {
+		return;
+	}
+
+	button.addEventListener( 'click', () => {
+		if ( ! window.confirm( 'Clear the entire activity log? This cannot be undone.' ) ) {
+			return;
+		}
+
+		const originalText = button.textContent;
+
+		button.disabled    = true;
+		button.textContent = 'Clearing\u2026';
+
+		const formData = new FormData();
+		formData.append( 'action', 'amm_clear_log' );
+		formData.append( 'nonce', ammAdmin.nonce );
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( response ) => response.json() )
+			.then( ( data ) => {
+				if ( data.success ) {
+					// Remove the log table and show empty message.
+					const logPanel = document.getElementById( 'log-panel' );
+
+					if ( logPanel ) {
+						const table = logPanel.querySelector( '.amm-log-table' );
+						const desc  = logPanel.querySelector( 'p.description' );
+
+						if ( table ) {
+							table.remove();
+						}
+
+						if ( desc ) {
+							desc.textContent = 'No generation activity yet. Activity will appear here once you start generating meta descriptions.';
+						}
+
+						button.style.display = 'none';
+
+						if ( resultEl ) {
+							resultEl.textContent   = data.data.message;
+							resultEl.style.display = '';
+						}
+					}
+				}
+			} )
+			.catch( () => {
+				if ( resultEl ) {
+					resultEl.textContent   = 'Failed to clear log.';
+					resultEl.style.display = '';
+				}
+			} )
+			.finally( () => {
+				button.disabled    = false;
+				button.textContent = originalText;
+			} );
+	} );
+}
+
+/**
  * Initialises the Term Manager and Post Manager admin pages.
  *
  * Handles:
@@ -275,9 +342,11 @@ function initManagerPage() {
 			const len     = desc.length;
 			const preview = len > 80 ? desc.substring( 0, 80 ) + '\u2026' : desc;
 
+			const charsClass = ( len >= 120 && len <= 160 ) ? 'amm-chars-good' : 'amm-chars-warn';
+
 			descCell.innerHTML = '<span class="amm-desc-text" title="' + escHtml( desc ) + '">' +
 			                     escHtml( preview ) + '</span>' +
-			                     ' <span class="amm-desc-chars">(' + len + ' chars)</span>';
+			                     ' <span class="amm-desc-chars ' + charsClass + '">(' + len + ' chars)</span>';
 		}
 
 		// Status cell.
@@ -514,6 +583,10 @@ function initManagerPage() {
 		}
 
 		event.preventDefault();
+
+		if ( ! window.confirm( 'Generate descriptions for the selected items? This will make API calls that may use credits.' ) ) {
+			return;
+		}
 
 		const typeInput = managerForm.querySelector( 'input[name="amm_type"]' );
 		const type      = typeInput ? typeInput.value : '';
@@ -785,6 +858,10 @@ function initBatchPanel() {
 	// -----------------------------------------------------------------------
 
 	startBtn.addEventListener( 'click', () => {
+		if ( ! window.confirm( 'Start batch generation? This will make API calls that may use credits.' ) ) {
+			return;
+		}
+
 		const type = batchTypeInput ? batchTypeInput.value : 'all';
 
 		startBtn.disabled = true;

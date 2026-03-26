@@ -1,6 +1,6 @@
 # Project Tracker
 
-**Version:** 0.4.0
+**Version:** 0.4.1
 **Last Updated:** 2026-03-26
 **Current Phase:** Complete
 **Overall Progress:** 11/11 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ✅, M8 ✅, M9 ✅, M10 ✅, M11 ✅

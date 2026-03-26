@@ -25,6 +25,7 @@ $amm_options = array(
 	'amm_prompt_template_posts',
 	'amm_max_tokens',
 	'amm_overwrite_existing',
+	'amm_use_site_language',
 	'amm_generation_log',
 	'amm_batch_delay',
 	'amm_batch_notice',

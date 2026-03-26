@@ -4,7 +4,7 @@ Tags: seo, meta description, ai, openai, anthropic
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,13 @@ The Batch tab queues all items missing descriptions and processes them in the ba
 4. Activity log tab
 
 == Changelog ==
+
+= 0.4.1 =
+* Fixed uninstall handler missing the site language option
+* Added Clear Log button on the Activity Log tab
+* Added character count colouring in manager tables (green/amber)
+* Added confirmation dialogs before batch and bulk generation
+* Updated all documentation to reflect recent features
 
 = 0.4.0 =
 * Added WP-CLI commands: wp amm status, list, generate (single and bulk)

@@ -571,4 +571,20 @@ class Admin_Hooks {
 			)
 		);
 	}
+
+	/**
+	 * AJAX handler: clears the activity log.
+	 *
+	 * @return void
+	 */
+	public function ajax_clear_log(): void {
+		check_ajax_referer( 'amm_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
+		}
+
+		update_option( AMM_OPT_GENERATION_LOG, array(), false );
+		wp_send_json_success( array( 'message' => __( 'Activity log cleared.', 'auto-multi-meta' ) ) );
+	}
 }

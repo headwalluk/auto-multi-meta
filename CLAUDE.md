@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Auto Multi-Meta is a WordPress plugin that generates SEO meta descriptions for taxonomy terms and posts using AI providers (OpenAI, Anthropic, OpenRouter). It writes descriptions to Yoast SEO or RankMath meta fields.
+Auto Multi-Meta is a WordPress plugin that generates SEO meta descriptions for taxonomy terms and posts using AI providers (OpenAI, Anthropic, OpenRouter). It writes descriptions to Yoast SEO, RankMath, or The SEO Framework meta fields.
 
-**Requirements:** WordPress 6.4+, PHP 8.0+, an active SEO plugin (Yoast or RankMath).
+**Requirements:** WordPress 6.4+, PHP 8.0+, an active SEO plugin (Yoast SEO, RankMath, or The SEO Framework).
 
 ## Commands
 
@@ -15,9 +15,12 @@ phpcs                  # Check all files for coding standard violations
 phpcs includes/        # Check specific directory
 phpcbf                 # Auto-fix coding standard issues
 wp plugin check auto-multi-meta  # Run WordPress plugin checker
+wp amm status          # Show plugin config via WP-CLI
+wp amm list terms      # List terms with meta description status
+wp amm list posts      # List posts with meta description status
 ```
 
-There are no automated tests, build steps, or package managers. Quality is enforced via phpcs with WordPress coding standards (`phpcs.xml`).
+There are no automated tests, build steps, or package managers. Quality is enforced via phpcs with WordPress coding standards (`phpcs.xml`). Releases are built via GitHub Actions (`.github/workflows/release.yml`) on tag push.
 
 ## Architecture
 
@@ -46,6 +49,7 @@ Subsystem instances are lazy-loaded via getter methods on `Plugin` (e.g. `get_ad
 3. `Admin_Hooks` handles menu registration, asset enqueuing, page rendering, and AJAX endpoints
 4. On generation: `Generator` orchestrates `Context_Builder` → `AI_Factory` → `AI_Provider::generate()` → `Meta_Handler` storage → activity log
 5. `Batch_Processor` handles background bulk generation via Action Scheduler (preferred) or WP-Cron fallback
+6. `CLI` (loaded only when `WP_CLI` is defined) provides `wp amm status`, `list`, and `generate` commands
 
 ### Constants
 

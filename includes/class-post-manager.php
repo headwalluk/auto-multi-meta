@@ -195,11 +195,17 @@ class Post_Manager extends \WP_List_Table {
 				? mb_substr( $desc, 0, 80 ) . '…'
 				: $desc;
 
+			$len         = mb_strlen( $desc );
+			$chars_class = ( $len >= AMM_META_DESC_TARGET_MIN && $len <= AMM_META_DESC_TARGET_MAX )
+				? 'amm-chars-good'
+				: 'amm-chars-warn';
+
 			$output = sprintf(
-				'<span class="amm-desc-text" title="%s">%s</span> <span class="amm-desc-chars">(%d chars)</span>',
+				'<span class="amm-desc-text" title="%s">%s</span> <span class="amm-desc-chars %s">(%d chars)</span>',
 				esc_attr( $desc ),
 				esc_html( $preview ),
-				mb_strlen( $desc )
+				esc_attr( $chars_class ),
+				$len
 			);
 		}
 

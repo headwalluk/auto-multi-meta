@@ -80,6 +80,7 @@ class Plugin {
 		add_action( 'wp_ajax_amm_start_batch', array( $this->get_admin_hooks(), 'ajax_start_batch' ) );
 		add_action( 'wp_ajax_amm_batch_progress', array( $this->get_admin_hooks(), 'ajax_batch_progress' ) );
 		add_action( 'wp_ajax_amm_cancel_batch', array( $this->get_admin_hooks(), 'ajax_cancel_batch' ) );
+		add_action( 'wp_ajax_amm_clear_log', array( $this->get_admin_hooks(), 'ajax_clear_log' ) );
 
 		// Batch processor action callbacks must be registered on every request
 		// because Action Scheduler dispatches on any incoming WordPress request.

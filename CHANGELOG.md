@@ -6,6 +6,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.4.1] — 2026-03-26
+
+### Fixed
+
+- Uninstall handler now removes the `amm_use_site_language` option (was missing from cleanup list)
+
+### Added
+
+- **Clear Log button** on the Activity Log tab with confirmation dialog and AJAX handler
+- **Character count colouring** in Term Manager and Post Manager — green for optimal length (120–160 chars), amber for outside range
+- **Confirmation dialogs** before batch start and bulk generate actions to prevent accidental API credit usage
+
+### Changed
+
+- Updated `docs/configuration.md` with TSF meta keys, site language setting, and prompt template guidance
+- Updated `docs/usage.md` with View button, Clear Log, confirmation dialogs, and WP-CLI cross-reference
+- Updated `CLAUDE.md` with TSF support, WP-CLI commands, and release workflow
+
+---
+
 ## [0.4.0] — 2026-03-26
 
 ### Added
