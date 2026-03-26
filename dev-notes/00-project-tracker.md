@@ -1,9 +1,9 @@
 # Project Tracker
 
-**Version:** 1.0.0-dev
+**Version:** 1.0.0
 **Last Updated:** 2026-03-26
 **Current Phase:** Milestone 7 (Polish, Testing & Documentation)
-**Overall Progress:** 86% (6/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅)
+**Overall Progress:** 90% (6/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ~60%)
 
 ---
 
@@ -255,12 +255,12 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 **Tasks:**
 - [x] Activity log tab: show recent generation history (term/post, provider, model, status, timestamp)
 - [x] Uninstall hook: clean up all options and transients on plugin deletion
-- [ ] I18n: verify all user-facing strings use `__()` / `_e()` with text domain `auto-multi-meta`
+- [x] I18n: verify all user-facing strings use `__()` / `_e()` with text domain `auto-multi-meta`
 - [x] Admin notices: show helpful notices (no API key set, no SEO plugin detected, batch complete)
-- [ ] Edge cases: empty taxonomies, posts with no content, very long content truncation, HTML in descriptions
-- [ ] README.md: proper plugin description, installation, usage, screenshots placeholder
-- [ ] CHANGELOG.md: v1.0.0 entry
-- [ ] Update plugin header with correct version, description, author info
+- [x] Edge cases: empty taxonomies, posts with no content, very long content truncation, HTML in descriptions
+- [x] README.md: proper plugin description, installation, usage, screenshots placeholder
+- [x] CHANGELOG.md: v1.0.0 entry
+- [x] Update plugin header with correct version, description, author info
 - [ ] Full phpcs pass across all files
 - [ ] Manual testing on westfield.local: activate, configure, generate for terms and posts
 - [ ] Git commit: `chore: v1.0.0 release preparation`

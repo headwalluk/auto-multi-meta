@@ -274,6 +274,11 @@
 	table-layout: fixed;
 }
 
+.amm-log-table td {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
+
 .amm-log-table .column-timestamp {
 	width: 160px;
 }
