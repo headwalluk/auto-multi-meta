@@ -43,6 +43,9 @@ define(
 	'Write a concise SEO meta description (150-160 characters) for a {post_type} titled "{post_title}". Summary: {post_excerpt}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Do not use quotes in the output.'
 );
 
+// HTTP timeout (seconds) for outbound AI API requests.
+define( 'AMM_HTTP_TIMEOUT', 30 );
+
 // SEO plugin meta keys — terms.
 define( 'AMM_YOAST_TERM_META_KEY', 'wpseo_desc' );
 define( 'AMM_RANKMATH_TERM_META_KEY', 'rank_math_description' );

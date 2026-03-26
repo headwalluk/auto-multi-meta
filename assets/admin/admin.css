@@ -25,6 +25,36 @@
 }
 
 /* ===================================================================
+   Test Connection
+   =================================================================== */
+
+.amm-test-connection {
+	margin: 0 0 20px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.amm-test-result {
+	padding: 4px 10px;
+	border-radius: 3px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.amm-test-result.is-success {
+	background: #edfaef;
+	color: #1a6b2a;
+	border: 1px solid #b3d7b9;
+}
+
+.amm-test-result.is-error {
+	background: #fce9e9;
+	color: #8b1a1a;
+	border: 1px solid #e0b3b3;
+}
+
+/* ===================================================================
    Checklist (Taxonomies & Post Types)
    =================================================================== */
 

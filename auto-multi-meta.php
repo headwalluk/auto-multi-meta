@@ -22,6 +22,11 @@ defined( 'ABSPATH' ) || die();
 
 require_once __DIR__ . '/constants.php';
 require_once AMM_DIR . 'includes/class-settings.php';
+require_once AMM_DIR . 'includes/class-ai-provider.php';
+require_once AMM_DIR . 'includes/class-ai-openai.php';
+require_once AMM_DIR . 'includes/class-ai-anthropic.php';
+require_once AMM_DIR . 'includes/class-ai-openrouter.php';
+require_once AMM_DIR . 'includes/class-ai-factory.php';
 require_once AMM_DIR . 'includes/class-admin-hooks.php';
 require_once AMM_DIR . 'includes/class-plugin.php';
 

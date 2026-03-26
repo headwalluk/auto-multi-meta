@@ -12,6 +12,7 @@
 document.addEventListener( 'DOMContentLoaded', () => {
 	initTabs();
 	initChecklistButtons();
+	initTestConnection();
 } );
 
 /**
@@ -105,5 +106,59 @@ function toggleCheckboxGroup( group, checked ) {
 
 	checkboxes.forEach( ( checkbox ) => {
 		checkbox.checked = checked;
+	} );
+}
+
+/**
+ * Initialises the Test Connection AJAX button.
+ *
+ * Sends a minimal prompt to the configured AI provider and reports
+ * success or failure in the result span.
+ */
+function initTestConnection() {
+	const button    = document.getElementById( 'amm-test-connection' );
+	const resultEl  = document.getElementById( 'amm-test-result' );
+
+	if ( ! button || ! resultEl ) {
+		return;
+	}
+
+	button.addEventListener( 'click', () => {
+		const originalText = button.textContent;
+
+		button.disabled    = true;
+		button.textContent = button.dataset.testing || 'Testing\u2026';
+
+		resultEl.style.display = 'none';
+		resultEl.className     = 'amm-test-result';
+		resultEl.textContent   = '';
+
+		const formData = new FormData();
+		formData.append( 'action', 'amm_test_connection' );
+		formData.append( 'nonce', ammAdmin.nonce );
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( response ) => response.json() )
+			.then( ( data ) => {
+				if ( data.success ) {
+					resultEl.textContent = data.data.message;
+					resultEl.classList.add( 'is-success' );
+				} else {
+					const msg = ( data.data && data.data.message ) ? data.data.message : 'An unknown error occurred.';
+					resultEl.textContent = msg;
+					resultEl.classList.add( 'is-error' );
+				}
+
+				resultEl.style.display = '';
+			} )
+			.catch( () => {
+				resultEl.textContent = 'Request failed. Please try again.';
+				resultEl.classList.add( 'is-error' );
+				resultEl.style.display = '';
+			} )
+			.finally( () => {
+				button.disabled    = false;
+				button.textContent = originalText;
+			} );
 	} );
 }

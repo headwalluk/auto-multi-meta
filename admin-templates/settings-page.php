@@ -184,6 +184,18 @@ $display_taxonomies  = array_filter(
 					</tbody>
 				</table>
 
+				<div class="amm-test-connection">
+					<?php
+					printf(
+						'<button type="button" id="amm-test-connection" class="button button-secondary">%s</button>',
+						esc_html__( 'Test Connection', 'auto-multi-meta' )
+					);
+					printf(
+						'<span id="amm-test-result" class="amm-test-result" style="display:none;" aria-live="polite"></span>'
+					);
+					?>
+				</div>
+
 				<h2><?php esc_html_e( 'Prompt Templates', 'auto-multi-meta' ); ?></h2>
 
 				<p class="description">

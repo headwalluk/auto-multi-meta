@@ -49,6 +49,7 @@ class Admin_Hooks {
 		add_action( 'admin_init', [ $this->plugin->get_settings(), 'register' ] );
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_action( 'wp_ajax_amm_test_connection', [ $this, 'ajax_test_connection' ] );
 	}
 
 	/**
@@ -120,5 +121,39 @@ class Admin_Hooks {
 		$all_post_types = get_post_types( [ 'public' => true ], 'objects' );
 
 		include AMM_DIR . 'admin-templates/settings-page.php';
+	}
+
+	/**
+	 * AJAX handler: test the configured AI provider connection.
+	 *
+	 * Sends a minimal prompt and returns success or a descriptive error message.
+	 *
+	 * @return void
+	 */
+	public function ajax_test_connection(): void {
+		check_ajax_referer( 'amm_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+		}
+
+		$provider = AI_Factory::make();
+
+		if ( is_wp_error( $provider ) ) {
+			wp_send_json_error( [ 'message' => $provider->get_error_message() ] );
+		}
+
+		$result = $provider->generate( 'Reply with the single word: OK' );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		wp_send_json_success(
+			[
+				'message'  => __( 'Connection successful.', 'auto-multi-meta' ),
+				'response' => $result,
+			]
+		);
 	}
 }
