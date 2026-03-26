@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0-dev
 **Last Updated:** 2026-03-26
-**Current Phase:** Milestone 1 (Plugin Skeleton & Settings)
-**Overall Progress:** 0%
+**Current Phase:** Milestone 2 (AI Provider Abstraction Layer)
+**Overall Progress:** 14% (1/7 milestones complete)
 
 ---
 
@@ -27,16 +27,19 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 
 ## Active TODO Items
 
-- [ ] M1: Scaffold plugin file structure and main plugin class
-- [ ] M1: Create constants.php with all option keys and defaults
-- [ ] M1: Build settings page with API provider configuration
-- [ ] M1: Implement SEO plugin auto-detection (Yoast / RankMath)
+- [x] M1: Scaffold plugin file structure and main plugin class
+- [x] M1: Create constants.php with all option keys and defaults
+- [x] M1: Build settings page with API provider configuration
+- [x] M1: Implement SEO plugin auto-detection (Yoast / RankMath)
+- [ ] M2: Define AI_Provider interface
+- [ ] M2: Implement OpenAI, Anthropic, OpenRouter providers
+- [ ] M2: AI_Factory, Test Connection AJAX endpoint
 
 ---
 
 ## Milestones
 
-### M1: Plugin Skeleton & Settings ⬜ (0%)
+### M1: Plugin Skeleton & Settings ✅ (100%)
 
 **Goal:** Working plugin that activates cleanly, has a settings page with tabbed UI, and stores API configuration.
 
@@ -52,23 +55,23 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - `assets/admin/admin.js` — Tab navigation, UI interactions
 
 **Tasks:**
-- [ ] Create main plugin file with proper header, namespace `Auto_Multi_Meta`, text domain `auto-multi-meta`
-- [ ] Create constants.php with option keys: `OPT_API_PROVIDER`, `OPT_API_KEY`, `OPT_MODEL`, `OPT_ENABLED_TAXONOMIES`, `OPT_ENABLED_POST_TYPES`, `OPT_PROMPT_TEMPLATE_TERMS`, `OPT_PROMPT_TEMPLATE_POSTS`, `OPT_MAX_TOKENS`, `OPT_OVERWRITE_EXISTING`
-- [ ] Create phpcs.xml with prefixes: `auto_multi_meta`, `amm`, `Auto_Multi_Meta`
-- [ ] Create Plugin class with run() method, lazy-loaded Settings and Admin_Hooks
-- [ ] Create Settings class: register all options via Settings API, sanitise callbacks, default values
-- [ ] Create Admin_Hooks class: admin menu (under Tools), conditional asset enqueuing
-- [ ] Create settings page template with 4 tabs: Settings, Taxonomies, Post Types, Log
-- [ ] Settings tab: API provider dropdown (openai/anthropic/openrouter), API key field (password type), model text field, max tokens, prompt templates (textarea with placeholder tokens)
-- [ ] Taxonomies tab: checklist of registered taxonomies with enable/disable toggles
-- [ ] Post Types tab: checklist of registered post types with enable/disable toggles
-- [ ] Log tab: placeholder for future activity log
-- [ ] Implement SEO plugin detection: check for Yoast (`WPSEO_VERSION`) and RankMath (`rank_math`), store detected plugin, surface on settings page
-- [ ] Create admin.js with hash-based tab navigation per admin-tabs.md pattern
-- [ ] Create admin.css with basic styling for settings page
-- [ ] Run phpcs/phpcbf, fix all violations
-- [ ] Activate plugin on westfield.local, verify settings page loads cleanly
-- [ ] Git commit: `feat: plugin skeleton with settings page and SEO detection`
+- [x] Create main plugin file with proper header, namespace `Auto_Multi_Meta`, text domain `auto-multi-meta`
+- [x] Create constants.php with option keys: `OPT_API_PROVIDER`, `OPT_API_KEY`, `OPT_MODEL`, `OPT_ENABLED_TAXONOMIES`, `OPT_ENABLED_POST_TYPES`, `OPT_PROMPT_TEMPLATE_TERMS`, `OPT_PROMPT_TEMPLATE_POSTS`, `OPT_MAX_TOKENS`, `OPT_OVERWRITE_EXISTING`
+- [x] Create phpcs.xml with prefixes: `auto_multi_meta`, `amm`, `Auto_Multi_Meta`
+- [x] Create Plugin class with run() method, lazy-loaded Settings and Admin_Hooks
+- [x] Create Settings class: register all options via Settings API, sanitise callbacks, default values
+- [x] Create Admin_Hooks class: admin menu (under Tools), conditional asset enqueuing
+- [x] Create settings page template with 4 tabs: Settings, Taxonomies, Post Types, Log
+- [x] Settings tab: API provider dropdown (openai/anthropic/openrouter), API key field (password type), model text field, max tokens, prompt templates (textarea with placeholder tokens)
+- [x] Taxonomies tab: checklist of registered taxonomies with enable/disable toggles
+- [x] Post Types tab: checklist of registered post types with enable/disable toggles
+- [x] Log tab: placeholder for future activity log
+- [x] Implement SEO plugin detection: check for Yoast (`WPSEO_VERSION`) and RankMath (`rank_math`), store detected plugin, surface on settings page
+- [x] Create admin.js with hash-based tab navigation per admin-tabs.md pattern
+- [x] Create admin.css with basic styling for settings page
+- [x] Run phpcs/phpcbf, fix all violations
+- [x] Activate plugin on westfield.local, verify settings page loads cleanly
+- [x] Git commit: `feat: plugin skeleton with settings page and SEO detection`
 
 **Completion criteria:**
 - Plugin activates without errors
@@ -76,6 +79,8 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - API key can be saved and retrieved
 - SEO plugin detection works (shows "None detected" on westfield.local unless Yoast/RankMath installed)
 - phpcs passes clean
+
+**Completed:** 2026-03-26 — All criteria met. Plugin activates clean, settings page renders with all 4 tabs, phpcs clean, error log empty.
 
 ---
 
