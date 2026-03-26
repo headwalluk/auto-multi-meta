@@ -1,0 +1,72 @@
+/**
+ * Auto Multi-Meta — Admin Styles
+ *
+ * @package Auto_Multi_Meta
+ */
+
+/* ===================================================================
+   Tab Panels
+   =================================================================== */
+
+.amm-tab-panel {
+	margin-top: 20px;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+/* ===================================================================
+   Inline Notices
+   =================================================================== */
+
+.amm-tab-panel .notice.inline {
+	margin: 0 0 20px;
+}
+
+/* ===================================================================
+   Checklist (Taxonomies & Post Types)
+   =================================================================== */
+
+.amm-checklist-actions {
+	margin-bottom: 12px;
+}
+
+.amm-checklist-actions .button {
+	margin-right: 6px;
+}
+
+.amm-checklist {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	columns: 2;
+	column-gap: 20px;
+}
+
+@media ( max-width: 900px ) {
+	.amm-checklist {
+		columns: 1;
+	}
+}
+
+.amm-checklist li {
+	margin-bottom: 10px;
+	break-inside: avoid;
+}
+
+.amm-checklist label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+}
+
+.amm-checklist input[type="checkbox"] {
+	flex-shrink: 0;
+}
+
+.amm-checklist code {
+	color: #666;
+	font-size: 11px;
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<ruleset name="Auto Multi-Meta Standards">
+	<description>WordPress Coding Standards for Auto Multi-Meta</description>
+
+	<file>.</file>
+
+	<!-- Exclude non-PHP directories and files -->
+	<exclude-pattern>*/assets/*</exclude-pattern>
+	<exclude-pattern>*/.git/*</exclude-pattern>
+	<exclude-pattern>*/dev-notes/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+
+	<!-- Arguments -->
+	<arg value="sp"/>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+
+	<!-- Rules -->
+	<rule ref="WordPress">
+		<!-- Allow short array syntax [] -->
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<!-- Allow short array syntax [] (PHPCSExtra rule) -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+	</rule>
+
+	<!-- Prefix rules -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="auto_multi_meta"/>
+				<element value="amm"/>
+				<element value="Auto_Multi_Meta"/>
+				<element value="AMM"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- AMM/amm are valid short prefixes for this project — suppress the length warning. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed">
+		<severity>0</severity>
+	</rule>
+
+	<!-- Minimum WP version for deprecated functions -->
+	<config name="minimum_supported_wp_version" value="6.4"/>
+
+	<!-- PHP version compatibility -->
+	<config name="testVersion" value="8.0-"/>
+</ruleset>
