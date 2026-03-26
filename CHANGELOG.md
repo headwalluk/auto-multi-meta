@@ -6,6 +6,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.3.0] — 2026-03-26
+
+### Added
+
+- **The SEO Framework support** — detects TSF via `THE_SEO_FRAMEWORK_PRESENT`, reads/writes post meta (`_genesis_description`) and term meta (serialized `autodescription-term-settings` array with read-merge-write)
+- **View button** in Term Manager and Post Manager — opens the term archive or post permalink in a new tab
+- **Test Connection detail** — success message now shows provider name, model name, and the AI's response text
+
+### Changed
+
+- **Settings form tab persistence** — active tab hash is preserved through form submission via `_wp_http_referer`, so saving on the Taxonomies or Post Types tab returns to the same tab
+- **Admin notices and settings page** updated to reference The SEO Framework alongside Yoast SEO and RankMath
+
+---
+
 ## [0.2.0] — 2026-03-26
 
 ### Changed

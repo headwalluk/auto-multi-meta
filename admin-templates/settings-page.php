@@ -28,6 +28,7 @@ $auto_multi_meta_generation_log     = (array) get_option( AMM_OPT_GENERATION_LOG
 $auto_multi_meta_seo_labels = [
 	'yoast'    => __( 'Yoast SEO', 'auto-multi-meta' ),
 	'rankmath' => __( 'RankMath', 'auto-multi-meta' ),
+	'tsf'      => __( 'The SEO Framework', 'auto-multi-meta' ),
 	'none'     => __( 'None detected', 'auto-multi-meta' ),
 ];
 
@@ -92,7 +93,7 @@ if ( 'none' !== $auto_multi_meta_seo_plugin ) {
 } else {
 	printf(
 		'<div class="notice notice-warning inline"><p>%s</p></div>',
-		esc_html__( 'No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' )
+		esc_html__( 'No supported SEO plugin detected (Yoast SEO, RankMath, or The SEO Framework). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' )
 	);
 }
 

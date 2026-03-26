@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die();
 // short-prefix detection behaviour (AMM = 3 chars), but the prefix is correctly applied.
 
 // Plugin metadata.
-define( 'AMM_VERSION', '0.2.0' );
+define( 'AMM_VERSION', '0.3.0' );
 define( 'AMM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AMM_URL', plugin_dir_url( __FILE__ ) );
 
@@ -71,10 +71,12 @@ define( 'AMM_META_DESC_ABSOLUTE_MAX', 320 );
 // SEO plugin meta keys — terms.
 define( 'AMM_YOAST_TERM_META_KEY', 'wpseo_desc' );
 define( 'AMM_RANKMATH_TERM_META_KEY', 'rank_math_description' );
+define( 'AMM_TSF_TERM_META_KEY', 'autodescription-term-settings' );
 
 // SEO plugin meta keys — posts.
 define( 'AMM_YOAST_POST_META_KEY', '_yoast_wpseo_metadesc' );
 define( 'AMM_RANKMATH_POST_META_KEY', 'rank_math_description' );
+define( 'AMM_TSF_POST_META_KEY', '_genesis_description' );
 
 // Batch processing — option key for configurable inter-item delay (seconds).
 define( 'AMM_OPT_BATCH_DELAY', 'amm_batch_delay' );

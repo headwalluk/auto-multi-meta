@@ -71,6 +71,24 @@ function initTabs() {
 		const tabName = window.location.hash.replace( '#', '' ) || defaultTab;
 		activateTab( tabName );
 	} );
+
+	// Preserve the active tab hash through settings form submission.
+	// WordPress options.php reads _wp_http_referer to build the redirect URL.
+	// The browser strips the fragment from the Referer header, so we inject it
+	// into the hidden _wp_http_referer field before the form is submitted.
+	const settingsForm = document.getElementById( 'amm-settings-form' );
+
+	if ( settingsForm ) {
+		settingsForm.addEventListener( 'submit', () => {
+			const refererInput = settingsForm.querySelector( 'input[name="_wp_http_referer"]' );
+
+			if ( refererInput ) {
+				const currentHash = window.location.hash || ( '#' + defaultTab );
+				const baseUrl     = refererInput.value.replace( /#.*$/, '' );
+				refererInput.value = baseUrl + currentHash;
+			}
+		} );
+	}
 }
 
 /**

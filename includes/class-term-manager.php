@@ -252,7 +252,18 @@ class Term_Manager extends \WP_List_Table {
 			esc_html__( 'Preview', 'auto-multi-meta' )
 		);
 
-		return $generate . ' ' . $preview;
+		$view_url = get_term_link( (int) $item['term_id'], (string) $item['taxonomy'] );
+		$view     = '';
+
+		if ( ! is_wp_error( $view_url ) ) {
+			$view = sprintf(
+				' <a href="%s" class="button button-small" target="_blank" rel="noopener noreferrer">%s</a>',
+				esc_url( $view_url ),
+				esc_html__( 'View', 'auto-multi-meta' )
+			);
+		}
+
+		return $generate . ' ' . $preview . $view;
 	}
 
 	/**

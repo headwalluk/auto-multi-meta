@@ -4,7 +4,7 @@ Tags: seo, meta description, ai, openai, anthropic
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,13 @@ The Batch tab queues all items missing descriptions and processes them in the ba
 4. Activity log tab
 
 == Changelog ==
+
+= 0.3.0 =
+* Added The SEO Framework (TSF) support for post and term meta descriptions
+* Test Connection now shows provider, model, and AI response in the result
+* Settings form preserves the active tab after saving (Taxonomies, Post Types, etc.)
+* Added View button in Term Manager and Post Manager to open items on the front-end
+* Updated admin notices and settings page to reference TSF alongside Yoast SEO and RankMath
 
 = 0.2.0 =
 * Refactored plugin bootstrap and hook registration architecture

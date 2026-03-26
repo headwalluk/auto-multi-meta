@@ -187,7 +187,7 @@ class Plugin {
 	/**
 	 * Detects the active SEO plugin.
 	 *
-	 * Returns 'yoast', 'rankmath', or 'none'.
+	 * Returns 'yoast', 'rankmath', 'tsf', or 'none'.
 	 *
 	 * @return string
 	 */
@@ -198,6 +198,8 @@ class Plugin {
 			$detected = 'yoast';
 		} elseif ( defined( 'RANK_MATH_VERSION' ) ) {
 			$detected = 'rankmath';
+		} elseif ( defined( 'THE_SEO_FRAMEWORK_PRESENT' ) ) {
+			$detected = 'tsf';
 		}
 
 		return $detected;

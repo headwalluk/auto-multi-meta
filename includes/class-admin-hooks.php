@@ -520,7 +520,7 @@ class Admin_Hooks {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
 				esc_html__(
-					'Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.',
+					'Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO, RankMath, or The SEO Framework). Meta descriptions cannot be stored without an active SEO plugin.',
 					'auto-multi-meta'
 				)
 			);
@@ -553,10 +553,21 @@ class Admin_Hooks {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
 
+		$auto_multi_meta_provider_name = (string) get_option( AMM_OPT_API_PROVIDER, AMM_DEFAULT_API_PROVIDER );
+		$auto_multi_meta_model_name    = (string) get_option( AMM_OPT_MODEL, AMM_DEFAULT_MODEL );
+
 		wp_send_json_success(
 			array(
-				'message'  => __( 'Connection successful.', 'auto-multi-meta' ),
+				'message'  => sprintf(
+					/* translators: 1: provider name, 2: model name, 3: AI response text. */
+					__( 'Connection successful. Provider: %1$s | Model: %2$s | Response: %3$s', 'auto-multi-meta' ),
+					$auto_multi_meta_provider_name,
+					$auto_multi_meta_model_name,
+					$result
+				),
 				'response' => $result,
+				'provider' => $auto_multi_meta_provider_name,
+				'model'    => $auto_multi_meta_model_name,
 			)
 		);
 	}

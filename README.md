@@ -3,7 +3,7 @@
 ![WordPress](https://img.shields.io/badge/WordPress-6.4%2B-blue)
 ![PHP](https://img.shields.io/badge/PHP-8.0%2B-purple)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Version](https://img.shields.io/badge/Version-0.2.0-orange)
+![Version](https://img.shields.io/badge/Version-0.3.0-orange)
 
 AI-generated SEO meta descriptions for taxonomy terms and posts. Supports OpenAI, Anthropic, and OpenRouter. Integrates with Yoast SEO and RankMath.
 
