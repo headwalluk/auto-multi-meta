@@ -1,8 +1,8 @@
 /**
  * Auto Multi-Meta — Admin JavaScript
  *
- * Provides hash-based tab navigation and checklist helpers for the
- * plugin settings page.
+ * Provides hash-based tab navigation, checklist helpers, and manager page
+ * AJAX actions (generate, preview, bulk generate) for the plugin admin pages.
  *
  * @package Auto_Multi_Meta
  */
@@ -13,6 +13,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	initTabs();
 	initChecklistButtons();
 	initTestConnection();
+	initManagerPage();
 } );
 
 /**
@@ -160,5 +161,446 @@ function initTestConnection() {
 				button.disabled    = false;
 				button.textContent = originalText;
 			} );
+	} );
+}
+
+/**
+ * Initialises the Term Manager and Post Manager admin pages.
+ *
+ * Handles:
+ * - Per-row Generate / Regenerate buttons (AJAX)
+ * - Per-row Preview buttons (AJAX, shows preview area)
+ * - Preview area Save and Dismiss
+ * - Bulk "Generate Missing Descriptions" action (sequential AJAX)
+ *
+ * Rows are updated in-place after successful generation so the user
+ * can see status changes without a page reload.
+ */
+function initManagerPage() {
+	const managerForm = document.getElementById( 'amm-term-manager-form' ) ||
+	                    document.getElementById( 'amm-post-manager-form' );
+
+	if ( ! managerForm ) {
+		return;
+	}
+
+	const noticeEl       = document.getElementById( 'amm-manager-notice' );
+	const previewArea    = document.getElementById( 'amm-preview-area' );
+	const previewContent = document.getElementById( 'amm-preview-content' );
+	const previewSaveBtn = document.getElementById( 'amm-preview-save' );
+	const previewDismiss = document.getElementById( 'amm-preview-dismiss' );
+
+	// Stores context for the currently visible preview so Save knows what to generate.
+	let previewContext = null;
+
+	// -----------------------------------------------------------------------
+	// Helpers
+	// -----------------------------------------------------------------------
+
+	/**
+	 * Escapes a string for safe insertion as HTML text content.
+	 *
+	 * @param {string} str Raw string.
+	 * @return {string} HTML-escaped string.
+	 */
+	function escHtml( str ) {
+		return String( str )
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' );
+	}
+
+	/**
+	 * Shows a notice above the list table.
+	 *
+	 * @param {string}  message  Message text.
+	 * @param {boolean} isError  True for error styling, false for success.
+	 */
+	function showNotice( message, isError ) {
+		if ( ! noticeEl ) {
+			return;
+		}
+
+		noticeEl.textContent  = message;
+		noticeEl.className    = 'amm-manager-notice notice notice-' + ( isError ? 'error' : 'success' );
+		noticeEl.style.display = '';
+	}
+
+	/**
+	 * Updates a table row's description and status cells in-place.
+	 *
+	 * @param {string} type     Item type: 'term' or 'post'.
+	 * @param {string} id       Item ID.
+	 * @param {string} taxonomy Taxonomy slug (terms only).
+	 * @param {string} desc     Generated meta description.
+	 */
+	function updateRow( type, id, taxonomy, desc ) {
+		let row = null;
+
+		if ( 'term' === type ) {
+			row = document.querySelector(
+				`tr[data-type="term"][data-id="${ id }"][data-taxonomy="${ taxonomy }"]`
+			);
+		} else {
+			row = document.querySelector( `tr[data-type="post"][data-id="${ id }"]` );
+		}
+
+		if ( ! row || ! desc ) {
+			return;
+		}
+
+		// Description cell.
+		const descCell = row.querySelector( '.column-description' );
+		if ( descCell ) {
+			const len     = desc.length;
+			const preview = len > 80 ? desc.substring( 0, 80 ) + '\u2026' : desc;
+
+			descCell.innerHTML = '<span class="amm-desc-text" title="' + escHtml( desc ) + '">' +
+			                     escHtml( preview ) + '</span>' +
+			                     ' <span class="amm-desc-chars">(' + len + ' chars)</span>';
+		}
+
+		// Status cell.
+		const statusCell = row.querySelector( '.column-status' );
+		if ( statusCell ) {
+			const len = desc.length;
+			const min = 120;
+			const max = 160;
+
+			if ( len >= min && len <= max ) {
+				statusCell.innerHTML = '<span class="amm-status amm-status-good" title="Good length (120\u2013160 chars)">&#9989;</span>';
+			} else {
+				statusCell.innerHTML = '<span class="amm-status amm-status-warn" title="Exists but outside optimal length (120\u2013160 chars)">&#9888;&#65039;</span>';
+			}
+		}
+
+		// Update generate button label to "Regenerate".
+		const genBtn = row.querySelector( '.amm-generate-btn' );
+		if ( genBtn ) {
+			genBtn.textContent = ammAdmin.i18n.regenerate || 'Regenerate';
+		}
+	}
+
+	/**
+	 * Sends an AJAX request to generate a single meta description.
+	 *
+	 * @param {string}   type     Item type: 'term' or 'post'.
+	 * @param {string}   id       Item ID.
+	 * @param {string}   taxonomy Taxonomy slug (terms only; pass '' for posts).
+	 * @param {boolean}  force    Whether to overwrite existing descriptions.
+	 * @param {Function} callback Called with (error, responseData).
+	 */
+	function ajaxGenerate( type, id, taxonomy, force, callback ) {
+		const formData = new FormData();
+		formData.append( 'action', 'amm_generate_single' );
+		formData.append( 'nonce', ammAdmin.nonce );
+		formData.append( 'type', type );
+		formData.append( 'id', id );
+		formData.append( 'force', force ? '1' : '0' );
+
+		if ( taxonomy ) {
+			formData.append( 'taxonomy', taxonomy );
+		}
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( r ) => r.json() )
+			.then( ( data ) => callback( null, data ) )
+			.catch( ( err ) => callback( err, null ) );
+	}
+
+	/**
+	 * Sends an AJAX request to preview a generated meta description (no save).
+	 *
+	 * @param {string}   type     Item type: 'term' or 'post'.
+	 * @param {string}   id       Item ID.
+	 * @param {string}   taxonomy Taxonomy slug (terms only; pass '' for posts).
+	 * @param {Function} callback Called with (error, responseData).
+	 */
+	function ajaxPreview( type, id, taxonomy, callback ) {
+		const formData = new FormData();
+		formData.append( 'action', 'amm_preview' );
+		formData.append( 'nonce', ammAdmin.nonce );
+		formData.append( 'type', type );
+		formData.append( 'id', id );
+
+		if ( taxonomy ) {
+			formData.append( 'taxonomy', taxonomy );
+		}
+
+		fetch( ammAdmin.ajaxUrl, { method: 'POST', body: formData } )
+			.then( ( r ) => r.json() )
+			.then( ( data ) => callback( null, data ) )
+			.catch( ( err ) => callback( err, null ) );
+	}
+
+	// -----------------------------------------------------------------------
+	// Generate button
+	// -----------------------------------------------------------------------
+
+	managerForm.addEventListener( 'click', ( event ) => {
+		const btn = event.target.closest( '.amm-generate-btn' );
+
+		if ( ! btn ) {
+			return;
+		}
+
+		const type     = btn.dataset.type     || '';
+		const id       = btn.dataset.id       || '';
+		const taxonomy = btn.dataset.taxonomy || '';
+		const original = btn.textContent;
+
+		btn.disabled    = true;
+		btn.textContent = ammAdmin.i18n.generating || 'Generating\u2026';
+
+		ajaxGenerate( type, id, taxonomy, true, ( err, data ) => {
+			btn.disabled    = false;
+			btn.textContent = original;
+
+			if ( err || ! data ) {
+				showNotice( ammAdmin.i18n.requestFailed || 'Request failed. Please try again.', true );
+				return;
+			}
+
+			if ( data.success ) {
+				updateRow( type, id, taxonomy, data.data.description || '' );
+				showNotice( data.data.message || 'Generated.', false );
+			} else {
+				const msg = ( data.data && data.data.message ) ? data.data.message : 'An error occurred.';
+				showNotice( msg, true );
+			}
+		} );
+	} );
+
+	// -----------------------------------------------------------------------
+	// Preview button
+	// -----------------------------------------------------------------------
+
+	managerForm.addEventListener( 'click', ( event ) => {
+		const btn = event.target.closest( '.amm-preview-btn' );
+
+		if ( ! btn ) {
+			return;
+		}
+
+		const type     = btn.dataset.type     || '';
+		const id       = btn.dataset.id       || '';
+		const taxonomy = btn.dataset.taxonomy || '';
+		const original = btn.textContent;
+
+		btn.disabled    = true;
+		btn.textContent = ammAdmin.i18n.previewing || 'Previewing\u2026';
+
+		ajaxPreview( type, id, taxonomy, ( err, data ) => {
+			btn.disabled    = false;
+			btn.textContent = original;
+
+			if ( err || ! data ) {
+				showNotice( ammAdmin.i18n.requestFailed || 'Request failed. Please try again.', true );
+				return;
+			}
+
+			if ( data.success ) {
+				const desc = data.data.description || '';
+				const len  = desc.length;
+
+				previewContext = { type, id, taxonomy };
+
+				if ( previewContent ) {
+					previewContent.innerHTML =
+						'<p class="amm-preview-desc">' + escHtml( desc ) + '</p>' +
+						'<p class="amm-preview-meta">' + len + ' characters</p>';
+				}
+
+				if ( previewArea ) {
+					previewArea.style.display = '';
+					previewArea.scrollIntoView( { behavior: 'smooth', block: 'nearest' } );
+				}
+			} else {
+				const msg = ( data.data && data.data.message ) ? data.data.message : 'An error occurred.';
+				showNotice( msg, true );
+			}
+		} );
+	} );
+
+	// -----------------------------------------------------------------------
+	// Preview area: Save This Description
+	// -----------------------------------------------------------------------
+
+	if ( previewSaveBtn ) {
+		previewSaveBtn.addEventListener( 'click', () => {
+			if ( ! previewContext ) {
+				return;
+			}
+
+			const { type, id, taxonomy } = previewContext;
+			const originalText           = previewSaveBtn.textContent;
+
+			previewSaveBtn.disabled    = true;
+			previewSaveBtn.textContent = ammAdmin.i18n.generating || 'Generating\u2026';
+
+			ajaxGenerate( type, id, taxonomy, true, ( err, data ) => {
+				previewSaveBtn.disabled    = false;
+				previewSaveBtn.textContent = originalText;
+
+				if ( previewArea ) {
+					previewArea.style.display = 'none';
+				}
+
+				previewContext = null;
+
+				if ( err || ! data ) {
+					showNotice( ammAdmin.i18n.requestFailed || 'Request failed. Please try again.', true );
+					return;
+				}
+
+				if ( data.success ) {
+					updateRow( type, id, taxonomy, data.data.description || '' );
+					showNotice( data.data.message || 'Saved.', false );
+				} else {
+					const msg = ( data.data && data.data.message ) ? data.data.message : 'An error occurred.';
+					showNotice( msg, true );
+				}
+			} );
+		} );
+	}
+
+	// -----------------------------------------------------------------------
+	// Preview area: Dismiss
+	// -----------------------------------------------------------------------
+
+	if ( previewDismiss ) {
+		previewDismiss.addEventListener( 'click', () => {
+			if ( previewArea ) {
+				previewArea.style.display = 'none';
+			}
+
+			previewContext = null;
+		} );
+	}
+
+	// -----------------------------------------------------------------------
+	// Bulk action: Generate Missing Descriptions
+	// -----------------------------------------------------------------------
+
+	managerForm.addEventListener( 'submit', ( event ) => {
+		const topSelect    = managerForm.querySelector( 'select[name="action"]' );
+		const bottomSelect = managerForm.querySelector( 'select[name="action2"]' );
+		const topVal       = topSelect    ? topSelect.value    : '-1';
+		const bottomVal    = bottomSelect ? bottomSelect.value : '-1';
+		const action       = '-1' !== topVal ? topVal : bottomVal;
+
+		if ( 'generate_missing' !== action ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		const typeInput = managerForm.querySelector( 'input[name="amm_type"]' );
+		const type      = typeInput ? typeInput.value : '';
+
+		const checkedBoxes = managerForm.querySelectorAll( 'input[name="item_ids[]"]:checked' );
+
+		if ( 0 === checkedBoxes.length ) {
+			showNotice( 'No items selected.', true );
+			return;
+		}
+
+		// Only include items that are missing a description.
+		const allIds = Array.from( checkedBoxes ).map( ( cb ) => cb.value );
+
+		const missingIds = allIds.filter( ( rawId ) => {
+			let row = null;
+
+			if ( 'term' === type ) {
+				const parts    = rawId.split( '|' );
+				const termId   = parts[ 0 ];
+				const taxonomy = parts[ 1 ] || '';
+				row = document.querySelector(
+					`tr[data-type="term"][data-id="${ termId }"][data-taxonomy="${ taxonomy }"]`
+				);
+			} else {
+				row = document.querySelector( `tr[data-type="post"][data-id="${ rawId }"]` );
+			}
+
+			if ( ! row ) {
+				return true;
+			}
+
+			return null !== row.querySelector( '.amm-status-missing' );
+		} );
+
+		const idsToProcess = missingIds.length > 0 ? missingIds : allIds;
+		const total        = idsToProcess.length;
+		let generated      = 0;
+		let skipped        = 0;
+		let errors         = 0;
+
+		showNotice(
+			( ammAdmin.i18n.bulkProgress || 'Generating %1$d of %2$d\u2026' )
+				.replace( '%1$d', '0' )
+				.replace( '%2$d', String( total ) ),
+			false
+		);
+
+		/**
+		 * Processes items one at a time to avoid hammering the API.
+		 *
+		 * @param {number} index Current item index.
+		 */
+		function processNext( index ) {
+			if ( index >= idsToProcess.length ) {
+				showNotice(
+					( ammAdmin.i18n.bulkComplete || '%1$d generated, %2$d skipped, %3$d errors.' )
+						.replace( '%1$d', String( generated ) )
+						.replace( '%2$d', String( skipped ) )
+						.replace( '%3$d', String( errors ) ),
+					errors > 0
+				);
+
+				return;
+			}
+
+			const rawId = idsToProcess[ index ];
+			let id      = rawId;
+			let taxonomy = '';
+
+			if ( 'term' === type ) {
+				const parts = rawId.split( '|' );
+				id          = parts[ 0 ];
+				taxonomy    = parts[ 1 ] || '';
+			}
+
+			showNotice(
+				( ammAdmin.i18n.bulkProgress || 'Generating %1$d of %2$d\u2026' )
+					.replace( '%1$d', String( index + 1 ) )
+					.replace( '%2$d', String( total ) ),
+				false
+			);
+
+			ajaxGenerate( type, id, taxonomy, false, ( err, data ) => {
+				if ( err || ! data ) {
+					errors++;
+				} else if ( data.success ) {
+					const status = data.data.status || '';
+					const desc   = data.data.description || '';
+
+					if ( 'generated' === status ) {
+						generated++;
+						updateRow( type, id, taxonomy, desc );
+					} else if ( 'skipped' === status ) {
+						skipped++;
+					} else {
+						errors++;
+					}
+				} else {
+					errors++;
+				}
+
+				processNext( index + 1 );
+			} );
+		}
+
+		processNext( 0 );
 	} );
 }

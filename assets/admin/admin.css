@@ -100,3 +100,118 @@
 	color: #666;
 	font-size: 11px;
 }
+
+/* ===================================================================
+   Manager Pages — Layout
+   =================================================================== */
+
+.amm-wrap .amm-manager-nav {
+	display: flex;
+	gap: 8px;
+	margin: 8px 0 16px;
+}
+
+.amm-manager-filters {
+	margin: 0 0 16px;
+}
+
+.amm-filter-form {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.amm-filter-form label {
+	font-weight: 600;
+}
+
+/* ===================================================================
+   Manager Pages — Notice Area
+   =================================================================== */
+
+.amm-manager-notice {
+	margin: 12px 0;
+	padding: 8px 12px;
+}
+
+/* ===================================================================
+   Manager Pages — Preview Area
+   =================================================================== */
+
+.amm-preview-area {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #2271b1;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin: 12px 0 16px;
+	padding: 16px 20px;
+}
+
+.amm-preview-area h3 {
+	margin-top: 0;
+}
+
+.amm-preview-content {
+	margin-bottom: 12px;
+}
+
+.amm-preview-desc {
+	font-size: 14px;
+	line-height: 1.6;
+	margin: 0 0 6px;
+	padding: 10px 14px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+}
+
+.amm-preview-meta {
+	color: #666;
+	font-size: 12px;
+	margin: 0;
+}
+
+.amm-preview-actions {
+	display: flex;
+	gap: 8px;
+}
+
+/* ===================================================================
+   Manager Pages — Status Indicators
+   =================================================================== */
+
+.amm-status {
+	font-size: 16px;
+	line-height: 1;
+}
+
+/* ===================================================================
+   Manager Pages — Description Column
+   =================================================================== */
+
+.amm-desc-text {
+	cursor: help;
+}
+
+.amm-desc-chars {
+	color: #666;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.amm-no-desc {
+	color: #999;
+}
+
+/* ===================================================================
+   Manager Pages — Action Buttons
+   =================================================================== */
+
+.column-actions .button {
+	margin-right: 4px;
+}
+
+.column-actions .button:last-child {
+	margin-right: 0;
+}

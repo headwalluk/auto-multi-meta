@@ -242,6 +242,127 @@ class Generator {
 	}
 
 	/**
+	 * Generates a preview meta description for a taxonomy term without saving.
+	 *
+	 * Builds context, calls the AI provider, and validates the response —
+	 * identical to generate_for_term() but does not write to term meta.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int    $term_id  Term ID.
+	 * @param string $taxonomy Taxonomy slug.
+	 *
+	 * @return array<string, string> Result with 'status' => 'preview', 'description', 'message' keys.
+	 */
+	public function preview_for_term( int $term_id, string $taxonomy ): array {
+		$result    = null;
+		$prompt    = '';
+		$ai_output = '';
+
+		// Build the prompt from context.
+		$prompt_or_error = $this->context_builder->build_term_prompt( $term_id, $taxonomy );
+
+		if ( is_wp_error( $prompt_or_error ) ) {
+			$result = $this->make_error_result( $prompt_or_error->get_error_message() );
+		} else {
+			$prompt = $prompt_or_error;
+		}
+
+		// Call the AI provider.
+		if ( is_null( $result ) ) {
+			$ai_result = $this->call_ai( $prompt );
+
+			if ( is_wp_error( $ai_result ) ) {
+				$result = $this->make_error_result( $ai_result->get_error_message() );
+			} else {
+				$ai_output = $ai_result;
+			}
+		}
+
+		// Validate the response length.
+		if ( is_null( $result ) ) {
+			$description = trim( $ai_output );
+			$validation  = $this->validate_description( $description );
+
+			if ( is_wp_error( $validation ) ) {
+				$result = $this->make_error_result( $validation->get_error_message() );
+			} else {
+				$result = [
+					'status'      => 'preview',
+					'description' => $description,
+					'message'     => sprintf(
+						/* translators: %d: Character count of the generated description. */
+						__( 'Preview ready — %d characters. Not saved.', 'auto-multi-meta' ),
+						mb_strlen( $description )
+					),
+				];
+			}
+		}
+
+		return (array) $result;
+	}
+
+	/**
+	 * Generates a preview meta description for a post without saving.
+	 *
+	 * Builds context, calls the AI provider, and validates the response —
+	 * identical to generate_for_post() but does not write to post meta.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return array<string, string> Result with 'status' => 'preview', 'description', 'message' keys.
+	 */
+	public function preview_for_post( int $post_id ): array {
+		$result    = null;
+		$prompt    = '';
+		$ai_output = '';
+
+		// Build the prompt from context.
+		$prompt_or_error = $this->context_builder->build_post_prompt( $post_id );
+
+		if ( is_wp_error( $prompt_or_error ) ) {
+			$result = $this->make_error_result( $prompt_or_error->get_error_message() );
+		} else {
+			$prompt = $prompt_or_error;
+		}
+
+		// Call the AI provider.
+		if ( is_null( $result ) ) {
+			$ai_result = $this->call_ai( $prompt );
+
+			if ( is_wp_error( $ai_result ) ) {
+				$result = $this->make_error_result( $ai_result->get_error_message() );
+			} else {
+				$ai_output = $ai_result;
+			}
+		}
+
+		// Validate the response length.
+		if ( is_null( $result ) ) {
+			$description = trim( $ai_output );
+			$validation  = $this->validate_description( $description );
+
+			if ( is_wp_error( $validation ) ) {
+				$result = $this->make_error_result( $validation->get_error_message() );
+			} else {
+				$result = [
+					'status'      => 'preview',
+					'description' => $description,
+					'message'     => sprintf(
+						/* translators: %d: Character count of the generated description. */
+						__( 'Preview ready — %d characters. Not saved.', 'auto-multi-meta' ),
+						mb_strlen( $description )
+					),
+				];
+			}
+		}
+
+		return (array) $result;
+	}
+
+	/**
 	 * Calls the configured AI provider with the given prompt.
 	 *
 	 * Delegates to AI_Factory to instantiate the correct provider from settings.

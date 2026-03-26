@@ -39,6 +39,27 @@ class Plugin {
 	private ?Admin_Hooks $admin_hooks = null;
 
 	/**
+	 * Meta_Handler instance (lazy-loaded).
+	 *
+	 * @var Meta_Handler|null
+	 */
+	private ?Meta_Handler $meta_handler = null;
+
+	/**
+	 * Context_Builder instance (lazy-loaded).
+	 *
+	 * @var Context_Builder|null
+	 */
+	private ?Context_Builder $context_builder = null;
+
+	/**
+	 * Generator instance (lazy-loaded).
+	 *
+	 * @var Generator|null
+	 */
+	private ?Generator $generator = null;
+
+	/**
 	 * Private constructor — use get_instance().
 	 */
 	private function __construct() {}
@@ -102,6 +123,48 @@ class Plugin {
 		}
 
 		return $this->admin_hooks;
+	}
+
+	/**
+	 * Returns the Meta_Handler instance, creating it if needed.
+	 *
+	 * @return Meta_Handler
+	 */
+	public function get_meta_handler(): Meta_Handler {
+		if ( null === $this->meta_handler ) {
+			$this->meta_handler = new Meta_Handler( $this->detect_seo_plugin() );
+		}
+
+		return $this->meta_handler;
+	}
+
+	/**
+	 * Returns the Context_Builder instance, creating it if needed.
+	 *
+	 * @return Context_Builder
+	 */
+	public function get_context_builder(): Context_Builder {
+		if ( null === $this->context_builder ) {
+			$this->context_builder = new Context_Builder();
+		}
+
+		return $this->context_builder;
+	}
+
+	/**
+	 * Returns the Generator instance, creating it if needed.
+	 *
+	 * @return Generator
+	 */
+	public function get_generator(): Generator {
+		if ( null === $this->generator ) {
+			$this->generator = new Generator(
+				$this->get_context_builder(),
+				$this->get_meta_handler()
+			);
+		}
+
+		return $this->generator;
 	}
 
 	/**

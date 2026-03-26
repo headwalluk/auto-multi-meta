@@ -262,6 +262,15 @@ $display_taxonomies  = array_filter(
 				<p class="description">
 					<?php esc_html_e( 'Select the taxonomies for which Auto Multi-Meta will generate meta descriptions on archive pages.', 'auto-multi-meta' ); ?>
 				</p>
+				<p>
+					<?php
+					printf(
+						'<a href="%s" class="button button-secondary">%s</a>',
+						esc_url( admin_url( 'tools.php?page=amm-term-manager' ) ),
+						esc_html__( 'Open Term Manager →', 'auto-multi-meta' )
+					);
+					?>
+				</p>
 
 				<!-- Hidden flag: lets the sanitise callback detect when this tab was submitted. -->
 				<input type="hidden" name="amm_taxonomies_submitted" value="1" />
@@ -301,6 +310,15 @@ $display_taxonomies  = array_filter(
 				<h2><?php esc_html_e( 'Enabled Post Types', 'auto-multi-meta' ); ?></h2>
 				<p class="description">
 					<?php esc_html_e( 'Select the post types for which Auto Multi-Meta will generate meta descriptions.', 'auto-multi-meta' ); ?>
+				</p>
+				<p>
+					<?php
+					printf(
+						'<a href="%s" class="button button-secondary">%s</a>',
+						esc_url( admin_url( 'tools.php?page=amm-post-manager' ) ),
+						esc_html__( 'Open Post Manager →', 'auto-multi-meta' )
+					);
+					?>
 				</p>
 
 				<!-- Hidden flag: lets the sanitise callback detect when this tab was submitted. -->
