@@ -253,10 +253,10 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 **Goal:** Production-ready v1.0.0 release.
 
 **Tasks:**
-- [ ] Activity log tab: show recent generation history (term/post, provider, model, status, timestamp)
-- [ ] Uninstall hook: clean up all options and transients on plugin deletion
+- [x] Activity log tab: show recent generation history (term/post, provider, model, status, timestamp)
+- [x] Uninstall hook: clean up all options and transients on plugin deletion
 - [ ] I18n: verify all user-facing strings use `__()` / `_e()` with text domain `auto-multi-meta`
-- [ ] Admin notices: show helpful notices (no API key set, no SEO plugin detected, batch complete)
+- [x] Admin notices: show helpful notices (no API key set, no SEO plugin detected, batch complete)
 - [ ] Edge cases: empty taxonomies, posts with no content, very long content truncation, HTML in descriptions
 - [ ] README.md: proper plugin description, installation, usage, screenshots placeholder
 - [ ] CHANGELOG.md: v1.0.0 entry
