@@ -3,7 +3,7 @@
 **Version:** 1.0.0
 **Last Updated:** 2026-03-26
 **Current Phase:** Milestone 7 (Polish, Testing & Documentation)
-**Overall Progress:** 90% (6/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ~60%)
+**Overall Progress:** 95% (6/7 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ~85%)
 
 ---
 
@@ -264,7 +264,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] Full phpcs pass across all files
 - [ ] Manual testing on westfield.local: activate, configure, generate for terms and posts
 - [x] Git commit: `chore: v1.0.0 release preparation`
-- [ ] Fix CSS overflow on Log tab activity table (column-message needs overflow-wrap/word-wrap)
+- [x] Fix CSS overflow on Log tab activity table (column-message needs overflow-wrap/word-wrap)
 - [ ] Tag release: `git tag v1.0.0`
 
 **Completion criteria:**
