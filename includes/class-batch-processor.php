@@ -26,37 +26,6 @@ defined( 'ABSPATH' ) || die();
 class Batch_Processor {
 
 	/**
-	 * Main plugin instance.
-	 *
-	 * @var Plugin
-	 */
-	private Plugin $plugin;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param Plugin $plugin Main plugin instance.
-	 */
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
-	}
-
-	/**
-	 * Registers Action Scheduler / WP-Cron action callbacks.
-	 *
-	 * Must be called unconditionally on every request (not just admin) because
-	 * Action Scheduler dispatches actions on any incoming WordPress request.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	public function register(): void {
-		add_action( AMM_BATCH_ACTION_TERM, [ $this, 'process_term_item' ], 10, 3 );
-		add_action( AMM_BATCH_ACTION_POST, [ $this, 'process_post_item' ], 10, 2 );
-	}
-
-	/**
 	 * Starts a new batch generation job.
 	 *
 	 * Collects all taxonomy terms or post-type posts that are missing meta
@@ -183,7 +152,7 @@ class Batch_Processor {
 			return;
 		}
 
-		$result = $this->plugin->get_generator()->generate_for_term( $term_id, $taxonomy );
+		$result = auto_multi_meta_get_plugin()->get_generator()->generate_for_term( $term_id, $taxonomy );
 		$status = ( 'error' === $result['status'] ) ? 'error' : $result['status'];
 
 		$this->finish_item( $batch, $index, $status );
@@ -210,7 +179,7 @@ class Batch_Processor {
 			return;
 		}
 
-		$result = $this->plugin->get_generator()->generate_for_post( $post_id );
+		$result = auto_multi_meta_get_plugin()->get_generator()->generate_for_post( $post_id );
 		$status = ( 'error' === $result['status'] ) ? 'error' : $result['status'];
 
 		$this->finish_item( $batch, $index, $status );
@@ -233,7 +202,7 @@ class Batch_Processor {
 	 */
 	private function collect_items( string $type, bool $force ): array {
 		$items        = [];
-		$meta_handler = $this->plugin->get_meta_handler();
+		$meta_handler = auto_multi_meta_get_plugin()->get_meta_handler();
 
 		if ( 'term' === $type || 'all' === $type ) {
 			$enabled_taxonomies = (array) get_option( AMM_OPT_ENABLED_TAXONOMIES, [] );

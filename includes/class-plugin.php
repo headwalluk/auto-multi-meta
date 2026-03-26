@@ -12,17 +12,10 @@ defined( 'ABSPATH' ) || die();
 /**
  * Class Plugin
  *
- * Singleton entry point. Registers core hooks and provides lazy access
- * to Settings and Admin_Hooks instances.
+ * Entry point. Registers core hooks and provides lazy access
+ * to subsystem instances.
  */
 class Plugin {
-
-	/**
-	 * Singleton instance.
-	 *
-	 * @var Plugin|null
-	 */
-	private static ?Plugin $instance = null;
 
 	/**
 	 * Settings instance (lazy-loaded).
@@ -67,30 +60,31 @@ class Plugin {
 	private ?Batch_Processor $batch_processor = null;
 
 	/**
-	 * Private constructor — use get_instance().
-	 */
-	private function __construct() {}
-
-	/**
-	 * Returns the singleton instance.
-	 *
-	 * @return Plugin
-	 */
-	public static function get_instance(): Plugin {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
-
-	/**
-	 * Registers the plugins_loaded hook to initialise the plugin.
+	 * Registers top-level WordPress hooks.
 	 *
 	 * @return void
 	 */
 	public function run(): void {
-		add_action( 'plugins_loaded', [ $this, 'init' ] );
+		add_action( 'plugins_loaded', array( $this, 'init' ) );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_menu', array( $this->get_admin_hooks(), 'register_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this->get_admin_hooks(), 'enqueue_assets' ) );
+		add_action( 'admin_notices', array( $this->get_admin_hooks(), 'display_batch_notice' ) );
+		add_action( 'admin_notices', array( $this->get_admin_hooks(), 'display_setup_notices' ) );
+
+		// AJAX endpoints.
+		add_action( 'wp_ajax_amm_test_connection', array( $this->get_admin_hooks(), 'ajax_test_connection' ) );
+		add_action( 'wp_ajax_amm_generate_single', array( $this->get_admin_hooks(), 'ajax_generate_single' ) );
+		add_action( 'wp_ajax_amm_generate_bulk', array( $this->get_admin_hooks(), 'ajax_generate_bulk' ) );
+		add_action( 'wp_ajax_amm_preview', array( $this->get_admin_hooks(), 'ajax_preview' ) );
+		add_action( 'wp_ajax_amm_start_batch', array( $this->get_admin_hooks(), 'ajax_start_batch' ) );
+		add_action( 'wp_ajax_amm_batch_progress', array( $this->get_admin_hooks(), 'ajax_batch_progress' ) );
+		add_action( 'wp_ajax_amm_cancel_batch', array( $this->get_admin_hooks(), 'ajax_cancel_batch' ) );
+
+		// Batch processor action callbacks must be registered on every request
+		// because Action Scheduler dispatches on any incoming WordPress request.
+		add_action( AMM_BATCH_ACTION_TERM, array( $this->get_batch_processor(), 'process_term_item' ), 10, 3 );
+		add_action( AMM_BATCH_ACTION_POST, array( $this->get_batch_processor(), 'process_post_item' ), 10, 2 );
 	}
 
 	/**
@@ -99,15 +93,17 @@ class Plugin {
 	 * @return void
 	 */
 	public function init(): void {
-		load_plugin_textdomain( 'auto-multi-meta', false, AMM_DIR . 'languages' );
+		// Intentionally empty. WordPress auto-loads translations for
+		// plugins hosted on wordpress.org since WP 4.6.
+	}
 
-		// Batch processor hooks must be registered on every request (not just admin)
-		// because Action Scheduler dispatches actions on any incoming WP request.
-		$this->get_batch_processor()->register();
-
-		if ( is_admin() ) {
-			$this->get_admin_hooks()->register();
-		}
+	/**
+	 * Runs on admin_init — registers settings with the Settings API.
+	 *
+	 * @return void
+	 */
+	public function admin_init(): void {
+		$this->get_settings()->register();
 	}
 
 	/**
@@ -130,7 +126,7 @@ class Plugin {
 	 */
 	public function get_admin_hooks(): Admin_Hooks {
 		if ( null === $this->admin_hooks ) {
-			$this->admin_hooks = new Admin_Hooks( $this );
+			$this->admin_hooks = new Admin_Hooks();
 		}
 
 		return $this->admin_hooks;
@@ -169,10 +165,7 @@ class Plugin {
 	 */
 	public function get_generator(): Generator {
 		if ( null === $this->generator ) {
-			$this->generator = new Generator(
-				$this->get_context_builder(),
-				$this->get_meta_handler()
-			);
+			$this->generator = new Generator( $this->get_context_builder(), $this->get_meta_handler() );
 		}
 
 		return $this->generator;
@@ -185,7 +178,7 @@ class Plugin {
 	 */
 	public function get_batch_processor(): Batch_Processor {
 		if ( null === $this->batch_processor ) {
-			$this->batch_processor = new Batch_Processor( $this );
+			$this->batch_processor = new Batch_Processor();
 		}
 
 		return $this->batch_processor;

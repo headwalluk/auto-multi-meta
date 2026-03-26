@@ -18,13 +18,6 @@ defined( 'ABSPATH' ) || die();
 class Admin_Hooks {
 
 	/**
-	 * Main plugin instance.
-	 *
-	 * @var Plugin
-	 */
-	private Plugin $plugin;
-
-	/**
 	 * Admin page hook suffix returned by add_management_page().
 	 *
 	 * @var string
@@ -46,35 +39,6 @@ class Admin_Hooks {
 	private string $post_manager_hook = '';
 
 	/**
-	 * Constructor.
-	 *
-	 * @param Plugin $plugin Main plugin instance.
-	 */
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
-	}
-
-	/**
-	 * Registers all admin-side WordPress hooks.
-	 *
-	 * @return void
-	 */
-	public function register(): void {
-		add_action( 'admin_init', [ $this->plugin->get_settings(), 'register' ] );
-		add_action( 'admin_menu', [ $this, 'register_menu' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		add_action( 'admin_notices', [ $this, 'display_batch_notice' ] );
-		add_action( 'admin_notices', [ $this, 'display_setup_notices' ] );
-		add_action( 'wp_ajax_amm_test_connection', [ $this, 'ajax_test_connection' ] );
-		add_action( 'wp_ajax_amm_generate_single', [ $this, 'ajax_generate_single' ] );
-		add_action( 'wp_ajax_amm_generate_bulk', [ $this, 'ajax_generate_bulk' ] );
-		add_action( 'wp_ajax_amm_preview', [ $this, 'ajax_preview' ] );
-		add_action( 'wp_ajax_amm_start_batch', [ $this, 'ajax_start_batch' ] );
-		add_action( 'wp_ajax_amm_batch_progress', [ $this, 'ajax_batch_progress' ] );
-		add_action( 'wp_ajax_amm_cancel_batch', [ $this, 'ajax_cancel_batch' ] );
-	}
-
-	/**
 	 * Adds the plugin page to the Tools menu.
 	 *
 	 * @return void
@@ -85,7 +49,10 @@ class Admin_Hooks {
 			__( 'Auto Multi-Meta', 'auto-multi-meta' ),
 			'manage_options',
 			'auto-multi-meta',
-			[ $this, 'render_settings_page' ]
+			array(
+				$this,
+				'render_settings_page',
+			)
 		);
 
 		// Hidden submenu pages for the manager views (not shown in navigation).
@@ -95,7 +62,10 @@ class Admin_Hooks {
 			'',
 			'manage_options',
 			'amm-term-manager',
-			[ $this, 'render_term_manager' ]
+			array(
+				$this,
+				'render_term_manager',
+			)
 		);
 
 		$this->post_manager_hook = (string) add_submenu_page(
@@ -104,7 +74,10 @@ class Admin_Hooks {
 			'',
 			'manage_options',
 			'amm-post-manager',
-			[ $this, 'render_post_manager' ]
+			array(
+				$this,
+				'render_post_manager',
+			)
 		);
 	}
 
@@ -115,41 +88,26 @@ class Admin_Hooks {
 	 * @return void
 	 */
 	public function enqueue_assets( string $hook_suffix ): void {
-		$is_plugin_page = in_array(
-			$hook_suffix,
-			[ $this->page_hook, $this->term_manager_hook, $this->post_manager_hook ],
-			true
-		);
+		$is_plugin_page = in_array( $hook_suffix, array( $this->page_hook, $this->term_manager_hook, $this->post_manager_hook ), true );
 
 		if ( ! $is_plugin_page ) {
 			return;
 		}
 
-		wp_enqueue_style(
-			'amm-admin',
-			AMM_URL . 'assets/admin/admin.css',
-			[],
-			AMM_VERSION
-		);
+		wp_enqueue_style( 'amm-admin', AMM_URL . 'assets/admin/admin.css', array(), AMM_VERSION );
 
-		wp_enqueue_script(
-			'amm-admin',
-			AMM_URL . 'assets/admin/admin.js',
-			[],
-			AMM_VERSION,
-			true
-		);
+		wp_enqueue_script( 'amm-admin', AMM_URL . 'assets/admin/admin.js', array(), AMM_VERSION, true );
 
 		wp_localize_script(
 			'amm-admin',
 			'ammAdmin',
-			[
+			array(
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( 'amm_admin' ),
 				'defaultTab'     => 'settings',
 				'termManagerUrl' => admin_url( 'tools.php?page=amm-term-manager' ),
 				'postManagerUrl' => admin_url( 'tools.php?page=amm-post-manager' ),
-				'i18n'           => [
+				'i18n'           => array(
 					'generating'      => __( 'Generating…', 'auto-multi-meta' ),
 					'previewing'      => __( 'Previewing…', 'auto-multi-meta' ),
 					'generate'        => __( 'Generate', 'auto-multi-meta' ),
@@ -169,8 +127,8 @@ class Admin_Hooks {
 					'batchCancelled'  => __( 'Cancelled after processing %1$d of %2$d items.', 'auto-multi-meta' ),
 					'batchFailed'     => __( 'Failed to start batch.', 'auto-multi-meta' ),
 					'batchCancelling' => __( 'Cancelling…', 'auto-multi-meta' ),
-				],
-			]
+				),
+			)
 		);
 	}
 
@@ -186,9 +144,9 @@ class Admin_Hooks {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'auto-multi-meta' ) );
 		}
 
-		$seo_plugin     = $this->plugin->detect_seo_plugin();
-		$all_taxonomies = get_taxonomies( [ 'public' => true ], 'objects' );
-		$all_post_types = get_post_types( [ 'public' => true ], 'objects' );
+		$auto_multi_meta_seo_plugin     = auto_multi_meta_get_plugin()->detect_seo_plugin();
+		$auto_multi_meta_all_taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
+		$auto_multi_meta_all_post_types = get_post_types( array( 'public' => true ), 'objects' );
 
 		include AMM_DIR . 'admin-templates/settings-page.php';
 	}
@@ -203,9 +161,9 @@ class Admin_Hooks {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'auto-multi-meta' ) );
 		}
 
-		$meta_handler       = $this->plugin->get_meta_handler();
-		$term_manager       = new Term_Manager( $meta_handler );
-		$enabled_taxonomies = (array) get_option( AMM_OPT_ENABLED_TAXONOMIES, [] );
+		$auto_multi_meta_meta_handler       = auto_multi_meta_get_plugin()->get_meta_handler();
+		$auto_multi_meta_term_manager       = new Term_Manager( $auto_multi_meta_meta_handler );
+		$auto_multi_meta_enabled_taxonomies = (array) get_option( AMM_OPT_ENABLED_TAXONOMIES, array() );
 
 		include AMM_DIR . 'admin-templates/term-manager.php';
 	}
@@ -220,9 +178,9 @@ class Admin_Hooks {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'auto-multi-meta' ) );
 		}
 
-		$meta_handler       = $this->plugin->get_meta_handler();
-		$post_manager       = new Post_Manager( $meta_handler );
-		$enabled_post_types = (array) get_option( AMM_OPT_ENABLED_POST_TYPES, [] );
+		$auto_multi_meta_meta_handler       = auto_multi_meta_get_plugin()->get_meta_handler();
+		$auto_multi_meta_post_manager       = new Post_Manager( $auto_multi_meta_meta_handler );
+		$auto_multi_meta_enabled_post_types = (array) get_option( AMM_OPT_ENABLED_POST_TYPES, array() );
 
 		include AMM_DIR . 'admin-templates/post-manager.php';
 	}
@@ -239,33 +197,33 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
 		$type     = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : '';
 		$item_id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 		$taxonomy = isset( $_POST['taxonomy'] ) ? sanitize_key( wp_unslash( $_POST['taxonomy'] ) ) : '';
 		$force    = isset( $_POST['force'] ) && '1' === $_POST['force'];
-		// phpcs:enable
+        // phpcs:enable
 
 		if ( ! $item_id ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid item ID.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Invalid item ID.', 'auto-multi-meta' ) ) );
 		}
 
-		$generator = $this->plugin->get_generator();
+		$generator = auto_multi_meta_get_plugin()->get_generator();
 		$result    = null;
 
 		if ( 'term' === $type ) {
 			if ( '' === $taxonomy ) {
-				wp_send_json_error( [ 'message' => __( 'Taxonomy is required for term generation.', 'auto-multi-meta' ) ] );
+				wp_send_json_error( array( 'message' => __( 'Taxonomy is required for term generation.', 'auto-multi-meta' ) ) );
 			}
 
 			$result = $generator->generate_for_term( $item_id, $taxonomy, $force );
 		} elseif ( 'post' === $type ) {
 			$result = $generator->generate_for_post( $item_id, $force );
 		} else {
-			wp_send_json_error( [ 'message' => __( 'Invalid type. Must be "term" or "post".', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Invalid type. Must be "term" or "post".', 'auto-multi-meta' ) ) );
 		}
 
 		if ( 'error' === $result['status'] ) {
@@ -288,27 +246,25 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
 		$type    = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : '';
-		$raw_ids = isset( $_POST['item_ids'] ) && is_array( $_POST['item_ids'] )
-			? array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['item_ids'] ) )
-			: [];
-		// phpcs:enable
+		$raw_ids = isset( $_POST['item_ids'] ) && is_array( $_POST['item_ids'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['item_ids'] ) ) : array();
+        // phpcs:enable
 
 		if ( empty( $raw_ids ) ) {
-			wp_send_json_error( [ 'message' => __( 'No items selected.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'No items selected.', 'auto-multi-meta' ) ) );
 		}
 
-		$generator = $this->plugin->get_generator();
-		$results   = [
+		$generator = auto_multi_meta_get_plugin()->get_generator();
+		$results   = array(
 			'generated' => 0,
 			'skipped'   => 0,
 			'errors'    => 0,
-			'items'     => [],
-		];
+			'items'     => array(),
+		);
 
 		foreach ( $raw_ids as $raw_id ) {
 			$item_result = null;
@@ -339,12 +295,12 @@ class Admin_Hooks {
 					++$results['errors'];
 				}
 
-				$results['items'][] = [
+				$results['items'][] = array(
 					'id'     => $raw_id,
 					'status' => $item_result['status'],
 					'desc'   => $item_result['description'],
 					'msg'    => $item_result['message'],
-				];
+				);
 			}
 		}
 
@@ -363,32 +319,32 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
 		$type     = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : '';
 		$item_id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 		$taxonomy = isset( $_POST['taxonomy'] ) ? sanitize_key( wp_unslash( $_POST['taxonomy'] ) ) : '';
-		// phpcs:enable
+        // phpcs:enable
 
 		if ( ! $item_id ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid item ID.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Invalid item ID.', 'auto-multi-meta' ) ) );
 		}
 
-		$generator = $this->plugin->get_generator();
+		$generator = auto_multi_meta_get_plugin()->get_generator();
 		$result    = null;
 
 		if ( 'term' === $type ) {
 			if ( '' === $taxonomy ) {
-				wp_send_json_error( [ 'message' => __( 'Taxonomy is required for term preview.', 'auto-multi-meta' ) ] );
+				wp_send_json_error( array( 'message' => __( 'Taxonomy is required for term preview.', 'auto-multi-meta' ) ) );
 			}
 
 			$result = $generator->preview_for_term( $item_id, $taxonomy );
 		} elseif ( 'post' === $type ) {
 			$result = $generator->preview_for_post( $item_id );
 		} else {
-			wp_send_json_error( [ 'message' => __( 'Invalid type. Must be "term" or "post".', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Invalid type. Must be "term" or "post".', 'auto-multi-meta' ) ) );
 		}
 
 		if ( 'error' === $result['status'] ) {
@@ -409,24 +365,24 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above via check_ajax_referer.
 		$raw_type = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : 'all';
 		$force    = isset( $_POST['force'] ) && '1' === $_POST['force'];
-		// phpcs:enable
+        // phpcs:enable
 
-		$valid_types = [ 'term', 'post', 'all' ];
+		$valid_types = array( 'term', 'post', 'all' );
 		$type        = in_array( $raw_type, $valid_types, true ) ? $raw_type : 'all';
 
-		$result = $this->plugin->get_batch_processor()->start_batch( $type, $force );
+		$result = auto_multi_meta_get_plugin()->get_batch_processor()->start_batch( $type, $force );
 
 		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
 
-		$progress = $this->plugin->get_batch_processor()->get_progress();
+		$progress = auto_multi_meta_get_plugin()->get_batch_processor()->get_progress();
 		wp_send_json_success( $progress );
 	}
 
@@ -441,10 +397,10 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		$progress = $this->plugin->get_batch_processor()->get_progress();
+		$progress = auto_multi_meta_get_plugin()->get_batch_processor()->get_progress();
 		wp_send_json_success( $progress );
 	}
 
@@ -459,11 +415,11 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
-		$this->plugin->get_batch_processor()->cancel_batch();
-		$progress = $this->plugin->get_batch_processor()->get_progress();
+		auto_multi_meta_get_plugin()->get_batch_processor()->cancel_batch();
+		$progress = auto_multi_meta_get_plugin()->get_batch_processor()->get_progress();
 		wp_send_json_success( $progress );
 	}
 
@@ -537,7 +493,7 @@ class Admin_Hooks {
 			return;
 		}
 
-		$plugin_screens = [ $this->page_hook, $this->term_manager_hook, $this->post_manager_hook ];
+		$plugin_screens = array( $this->page_hook, $this->term_manager_hook, $this->post_manager_hook );
 
 		if ( ! in_array( $screen->id, $plugin_screens, true ) ) {
 			return;
@@ -558,12 +514,15 @@ class Admin_Hooks {
 			);
 		}
 
-		$seo_plugin = $this->plugin->detect_seo_plugin();
+		$seo_plugin = auto_multi_meta_get_plugin()->detect_seo_plugin();
 
 		if ( 'none' === $seo_plugin ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
-				esc_html__( 'Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' )
+				esc_html__(
+					'Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.',
+					'auto-multi-meta'
+				)
 			);
 		}
 	}
@@ -579,26 +538,26 @@ class Admin_Hooks {
 		check_ajax_referer( 'amm_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ] );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'auto-multi-meta' ) ) );
 		}
 
 		$provider = AI_Factory::make();
 
 		if ( is_wp_error( $provider ) ) {
-			wp_send_json_error( [ 'message' => $provider->get_error_message() ] );
+			wp_send_json_error( array( 'message' => $provider->get_error_message() ) );
 		}
 
 		$result = $provider->generate( 'Reply with the single word: OK' );
 
 		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
 
 		wp_send_json_success(
-			[
+			array(
 				'message'  => __( 'Connection successful.', 'auto-multi-meta' ),
 				'response' => $result,
-			]
+			)
 		);
 	}
 }

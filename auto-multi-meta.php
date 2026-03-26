@@ -1,26 +1,25 @@
 <?php
 /**
  * Plugin Name: Auto Multi-Meta
- * Plugin URI: https://headwall.co.uk/
+ * Plugin URI: https://headwall-hosting.com/
  * Description: Automatically generates SEO meta descriptions for taxonomy term archives and post types using AI (OpenAI, Anthropic, OpenRouter).
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires at least: 6.4
  * Requires PHP: 8.0
- * Author: Headwall
- * Author URI: https://headwall.co.uk/
+ * Author: Paul Faulkner
+ * Author URI: https://headwall-hositng.com/
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: auto-multi-meta
- * Domain Path: /languages
  *
  * @package Auto_Multi_Meta
  */
 
-namespace Auto_Multi_Meta;
-
 defined( 'ABSPATH' ) || die();
 
 require_once __DIR__ . '/constants.php';
+require_once __DIR__ . '/functions-private.php';
+
 require_once AMM_DIR . 'includes/class-settings.php';
 require_once AMM_DIR . 'includes/class-ai-provider.php';
 require_once AMM_DIR . 'includes/class-ai-openai.php';
@@ -37,12 +36,11 @@ require_once AMM_DIR . 'includes/class-admin-hooks.php';
 require_once AMM_DIR . 'includes/class-plugin.php';
 
 /**
- * Returns the main plugin instance.
+ * Boots the plugin.
  *
- * @return Plugin
+ * @return void
  */
-function amm(): Plugin {
-	return Plugin::get_instance();
+function auto_multi_meta_plugin_run(): void {
+	auto_multi_meta_get_plugin()->run();
 }
-
-amm()->run();
+auto_multi_meta_plugin_run();

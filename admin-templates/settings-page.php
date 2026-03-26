@@ -4,507 +4,432 @@
  *
  * Variables provided by Admin_Hooks::render_settings_page():
  *
- * @var string       $seo_plugin     Detected SEO plugin ('yoast', 'rankmath', 'none').
- * @var \WP_Taxonomy[] $all_taxonomies  Registered public taxonomies (objects).
- * @var \WP_Post_Type[] $all_post_types  Registered public post types (objects).
+ * @var string          $auto_multi_meta_seo_plugin     Detected SEO plugin ('yoast', 'rankmath', 'none').
+ * @var \WP_Taxonomy[]  $auto_multi_meta_all_taxonomies Registered public taxonomies (objects).
+ * @var \WP_Post_Type[] $auto_multi_meta_all_post_types Registered public post types (objects).
  *
  * @package Auto_Multi_Meta
  */
 
 defined( 'ABSPATH' ) || die();
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-// Reason: These variables are template-scoped locals, not true PHP globals. PHPCS flags
-// them because this file is parsed in isolation (outside the including method's scope).
+$auto_multi_meta_enabled_taxonomies = (array) get_option( AMM_OPT_ENABLED_TAXONOMIES, [] );
+$auto_multi_meta_enabled_post_types = (array) get_option( AMM_OPT_ENABLED_POST_TYPES, [] );
+$auto_multi_meta_api_provider       = (string) get_option( AMM_OPT_API_PROVIDER, AMM_DEFAULT_API_PROVIDER );
+$auto_multi_meta_api_key            = (string) get_option( AMM_OPT_API_KEY, '' );
+$auto_multi_meta_model              = (string) get_option( AMM_OPT_MODEL, AMM_DEFAULT_MODEL );
+$auto_multi_meta_max_tokens         = (int) get_option( AMM_OPT_MAX_TOKENS, AMM_DEFAULT_MAX_TOKENS );
+$auto_multi_meta_prompt_terms       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_TERMS, AMM_DEFAULT_PROMPT_TEMPLATE_TERMS );
+$auto_multi_meta_prompt_posts       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_POSTS, AMM_DEFAULT_PROMPT_TEMPLATE_POSTS );
+$auto_multi_meta_overwrite          = (bool) get_option( AMM_OPT_OVERWRITE_EXISTING, AMM_DEFAULT_OVERWRITE_EXISTING );
+$auto_multi_meta_batch_delay        = (int) get_option( AMM_OPT_BATCH_DELAY, AMM_DEFAULT_BATCH_DELAY );
+$auto_multi_meta_generation_log     = (array) get_option( AMM_OPT_GENERATION_LOG, [] );
 
-$enabled_taxonomies = (array) get_option( AMM_OPT_ENABLED_TAXONOMIES, [] );
-$enabled_post_types = (array) get_option( AMM_OPT_ENABLED_POST_TYPES, [] );
-$api_provider       = (string) get_option( AMM_OPT_API_PROVIDER, AMM_DEFAULT_API_PROVIDER );
-$api_key            = (string) get_option( AMM_OPT_API_KEY, '' );
-$model              = (string) get_option( AMM_OPT_MODEL, AMM_DEFAULT_MODEL );
-$max_tokens         = (int) get_option( AMM_OPT_MAX_TOKENS, AMM_DEFAULT_MAX_TOKENS );
-$prompt_terms       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_TERMS, AMM_DEFAULT_PROMPT_TEMPLATE_TERMS );
-$prompt_posts       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_POSTS, AMM_DEFAULT_PROMPT_TEMPLATE_POSTS );
-$overwrite          = (bool) get_option( AMM_OPT_OVERWRITE_EXISTING, AMM_DEFAULT_OVERWRITE_EXISTING );
-$batch_delay        = (int) get_option( AMM_OPT_BATCH_DELAY, AMM_DEFAULT_BATCH_DELAY );
-$generation_log     = (array) get_option( AMM_OPT_GENERATION_LOG, [] );
-
-$seo_labels = [
+$auto_multi_meta_seo_labels = [
 	'yoast'    => __( 'Yoast SEO', 'auto-multi-meta' ),
 	'rankmath' => __( 'RankMath', 'auto-multi-meta' ),
 	'none'     => __( 'None detected', 'auto-multi-meta' ),
 ];
 
-$provider_labels = [
+$auto_multi_meta_provider_labels = [
 	'openai'     => __( 'OpenAI', 'auto-multi-meta' ),
 	'anthropic'  => __( 'Anthropic', 'auto-multi-meta' ),
 	'openrouter' => __( 'OpenRouter', 'auto-multi-meta' ),
 ];
 
 // Exclude internal / attachment post types.
-$excluded_post_types = [ 'attachment', 'revision', 'nav_menu_item', 'custom_css', 'customize_changeset', 'oembed_cache', 'user_request', 'wp_block', 'wp_template', 'wp_template_part', 'wp_global_styles', 'wp_navigation' ];
-$display_post_types  = array_filter(
-	$all_post_types,
-	function ( $pt ) use ( $excluded_post_types ) {
-		return ! in_array( $pt->name, $excluded_post_types, true );
+$auto_multi_meta_excluded_post_types = [ 'attachment', 'revision', 'nav_menu_item', 'custom_css', 'customize_changeset', 'oembed_cache', 'user_request', 'wp_block', 'wp_template', 'wp_template_part', 'wp_global_styles', 'wp_navigation' ];
+$auto_multi_meta_display_post_types  = array_filter(
+	$auto_multi_meta_all_post_types,
+	function ( $auto_multi_meta_pt ) use ( $auto_multi_meta_excluded_post_types ) {
+		return ! in_array( $auto_multi_meta_pt->name, $auto_multi_meta_excluded_post_types, true );
 	}
 );
 
 // Exclude internal taxonomies.
-$excluded_taxonomies = [ 'nav_menu', 'link_category', 'post_format' ];
-$display_taxonomies  = array_filter(
-	$all_taxonomies,
-	function ( $tax ) use ( $excluded_taxonomies ) {
-		return ! in_array( $tax->name, $excluded_taxonomies, true );
+$auto_multi_meta_excluded_taxonomies = [ 'nav_menu', 'link_category', 'post_format' ];
+$auto_multi_meta_display_taxonomies  = array_filter(
+	$auto_multi_meta_all_taxonomies,
+	function ( $auto_multi_meta_tax ) use ( $auto_multi_meta_excluded_taxonomies ) {
+		return ! in_array( $auto_multi_meta_tax->name, $auto_multi_meta_excluded_taxonomies, true );
 	}
 );
-?>
 
-<div class="wrap amm-wrap">
-	<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+// Page wrapper and heading.
+printf( '<div class="wrap amm-wrap">' );
+printf( '<h1>%s</h1>', esc_html( get_admin_page_title() ) );
 
-	<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Settings tabs', 'auto-multi-meta' ); ?>">
-		<a href="#settings" class="nav-tab" data-tab="settings">
-			<?php esc_html_e( 'Settings', 'auto-multi-meta' ); ?>
-		</a>
-		<a href="#taxonomies" class="nav-tab" data-tab="taxonomies">
-			<?php esc_html_e( 'Taxonomies', 'auto-multi-meta' ); ?>
-		</a>
-		<a href="#post-types" class="nav-tab" data-tab="post-types">
-			<?php esc_html_e( 'Post Types', 'auto-multi-meta' ); ?>
-		</a>
-		<a href="#log" class="nav-tab" data-tab="log">
-			<?php esc_html_e( 'Log', 'auto-multi-meta' ); ?>
-		</a>
-		<a href="#batch" class="nav-tab" data-tab="batch">
-			<?php esc_html_e( 'Batch', 'auto-multi-meta' ); ?>
-		</a>
-	</nav>
+// Tab navigation.
+printf(
+	'<nav class="nav-tab-wrapper wp-clearfix" aria-label="%s">',
+	esc_attr__( 'Settings tabs', 'auto-multi-meta' )
+);
+printf( '<a href="#settings" class="nav-tab" data-tab="settings">%s</a>', esc_html__( 'Settings', 'auto-multi-meta' ) );
+printf( '<a href="#taxonomies" class="nav-tab" data-tab="taxonomies">%s</a>', esc_html__( 'Taxonomies', 'auto-multi-meta' ) );
+printf( '<a href="#post-types" class="nav-tab" data-tab="post-types">%s</a>', esc_html__( 'Post Types', 'auto-multi-meta' ) );
+printf( '<a href="#log" class="nav-tab" data-tab="log">%s</a>', esc_html__( 'Log', 'auto-multi-meta' ) );
+printf( '<a href="#batch" class="nav-tab" data-tab="batch">%s</a>', esc_html__( 'Batch', 'auto-multi-meta' ) );
+printf( '</nav>' );
 
-	<form method="post" action="options.php" id="amm-settings-form">
-		<?php settings_fields( \Auto_Multi_Meta\Settings::OPTION_GROUP ); ?>
+// Settings form.
+printf( '<form method="post" action="options.php" id="amm-settings-form">' );
+settings_fields( \Auto_Multi_Meta\Settings::OPTION_GROUP );
+printf( '<div class="amm-tab-content">' );
 
-		<div class="amm-tab-content">
+// ===== Settings Tab =====
+printf( '<div id="settings-panel" class="amm-tab-panel">' );
 
-			<!-- ===== Settings Tab ===== -->
-			<div id="settings-panel" class="amm-tab-panel">
+// SEO plugin detection notice.
+if ( 'none' !== $auto_multi_meta_seo_plugin ) {
+	printf(
+		'<div class="notice notice-success inline"><p>%s</p></div>',
+		sprintf(
+			/* translators: %s: SEO plugin name. */
+			esc_html__( 'SEO plugin detected: %s. Meta descriptions will be written to the correct meta keys automatically.', 'auto-multi-meta' ),
+			'<strong>' . esc_html( $auto_multi_meta_seo_labels[ $auto_multi_meta_seo_plugin ] ) . '</strong>'
+		)
+	);
+} else {
+	printf(
+		'<div class="notice notice-warning inline"><p>%s</p></div>',
+		esc_html__( 'No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' )
+	);
+}
 
-				<?php if ( 'none' !== $seo_plugin ) : ?>
-				<div class="notice notice-success inline">
-					<p>
-						<?php
-						printf(
-							/* translators: %s: SEO plugin name. */
-							esc_html__( 'SEO plugin detected: %s. Meta descriptions will be written to the correct meta keys automatically.', 'auto-multi-meta' ),
-							'<strong>' . esc_html( $seo_labels[ $seo_plugin ] ) . '</strong>'
-						);
-						?>
-					</p>
-				</div>
-				<?php else : ?>
-				<div class="notice notice-warning inline">
-					<p>
-						<?php esc_html_e( 'No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' ); ?>
-					</p>
-				</div>
-				<?php endif; ?>
+// AI Provider section.
+printf( '<h2>%s</h2>', esc_html__( 'AI Provider', 'auto-multi-meta' ) );
+printf( '<table class="form-table" role="presentation"><tbody>' );
 
-				<h2><?php esc_html_e( 'AI Provider', 'auto-multi-meta' ); ?></h2>
+// Provider dropdown.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-api-provider">%s</label>', esc_html__( 'Provider', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf( '<select name="%s" id="amm-api-provider">', esc_attr( AMM_OPT_API_PROVIDER ) );
+foreach ( $auto_multi_meta_provider_labels as $auto_multi_meta_provider_value => $auto_multi_meta_provider_label ) {
+	printf(
+		'<option value="%s"%s>%s</option>',
+		esc_attr( $auto_multi_meta_provider_value ),
+		selected( $auto_multi_meta_api_provider, $auto_multi_meta_provider_value, false ),
+		esc_html( $auto_multi_meta_provider_label )
+	);
+}
+printf( '</select>' );
+printf( '<p class="description">%s</p>', esc_html__( 'Select which AI service to use for generating meta descriptions.', 'auto-multi-meta' ) );
+printf( '</td></tr>' );
 
-				<table class="form-table" role="presentation">
-					<tbody>
-						<tr>
-							<th scope="row">
-								<label for="amm-api-provider"><?php esc_html_e( 'Provider', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<select name="<?php echo esc_attr( AMM_OPT_API_PROVIDER ); ?>" id="amm-api-provider">
-									<?php foreach ( $provider_labels as $amm_provider_value => $amm_provider_label ) : ?>
-									<option value="<?php echo esc_attr( $amm_provider_value ); ?>" <?php selected( $api_provider, $amm_provider_value ); ?>>
-										<?php echo esc_html( $amm_provider_label ); ?>
-									</option>
-									<?php endforeach; ?>
-								</select>
-								<p class="description">
-									<?php esc_html_e( 'Select which AI service to use for generating meta descriptions.', 'auto-multi-meta' ); ?>
-								</p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row">
-								<label for="amm-api-key"><?php esc_html_e( 'API Key', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<input
-									type="password"
-									name="<?php echo esc_attr( AMM_OPT_API_KEY ); ?>"
-									id="amm-api-key"
-									value="<?php echo esc_attr( $api_key ); ?>"
-									class="regular-text"
-									autocomplete="new-password"
-								/>
-								<p class="description">
-									<?php esc_html_e( 'Your API key. Leave blank to keep the existing saved key.', 'auto-multi-meta' ); ?>
-								</p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row">
-								<label for="amm-model"><?php esc_html_e( 'Model', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<input
-									type="text"
-									name="<?php echo esc_attr( AMM_OPT_MODEL ); ?>"
-									id="amm-model"
-									value="<?php echo esc_attr( $model ); ?>"
-									class="regular-text"
-									placeholder="gpt-4o-mini"
-								/>
-								<p class="description">
-									<?php esc_html_e( 'Model name to use. Examples: gpt-4o-mini, claude-3-haiku-20240307, openai/gpt-4o-mini.', 'auto-multi-meta' ); ?>
-								</p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row">
-								<label for="amm-max-tokens"><?php esc_html_e( 'Max Tokens', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<input
-									type="number"
-									name="<?php echo esc_attr( AMM_OPT_MAX_TOKENS ); ?>"
-									id="amm-max-tokens"
-									value="<?php echo esc_attr( (string) $max_tokens ); ?>"
-									class="small-text"
-									min="50"
-									max="4096"
-									step="10"
-								/>
-								<p class="description">
-									<?php esc_html_e( 'Maximum tokens for the AI response (50–4096). Default: 300.', 'auto-multi-meta' ); ?>
-								</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+// API Key.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-api-key">%s</label>', esc_html__( 'API Key', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<input type="password" name="%s" id="amm-api-key" value="%s" class="regular-text" autocomplete="new-password" />',
+	esc_attr( AMM_OPT_API_KEY ),
+	esc_attr( $auto_multi_meta_api_key )
+);
+printf( '<p class="description">%s</p>', esc_html__( 'Your API key. Leave blank to keep the existing saved key.', 'auto-multi-meta' ) );
+printf( '</td></tr>' );
 
-				<div class="amm-test-connection">
-					<?php
-					printf(
-						'<button type="button" id="amm-test-connection" class="button button-secondary">%s</button>',
-						esc_html__( 'Test Connection', 'auto-multi-meta' )
-					);
-					printf(
-						'<span id="amm-test-result" class="amm-test-result" style="display:none;" aria-live="polite"></span>'
-					);
-					?>
-				</div>
+// Model.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-model">%s</label>', esc_html__( 'Model', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<input type="text" name="%s" id="amm-model" value="%s" class="regular-text" placeholder="gpt-4o-mini" />',
+	esc_attr( AMM_OPT_MODEL ),
+	esc_attr( $auto_multi_meta_model )
+);
+printf( '<p class="description">%s</p>', esc_html__( 'Model name to use. Examples: gpt-4o-mini, claude-3-haiku-20240307, openai/gpt-4o-mini.', 'auto-multi-meta' ) );
+printf( '</td></tr>' );
 
-				<h2><?php esc_html_e( 'Prompt Templates', 'auto-multi-meta' ); ?></h2>
+// Max Tokens.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-max-tokens">%s</label>', esc_html__( 'Max Tokens', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<input type="number" name="%s" id="amm-max-tokens" value="%s" class="small-text" min="50" max="4096" step="10" />',
+	esc_attr( AMM_OPT_MAX_TOKENS ),
+	esc_attr( (string) $auto_multi_meta_max_tokens )
+);
+printf( '<p class="description">%s</p>', esc_html__( 'Maximum tokens for the AI response (50–4096). Default: 300.', 'auto-multi-meta' ) );
+printf( '</td></tr>' );
 
-				<p class="description">
-					<?php
-					printf(
-						/* translators: Placeholder token list. */
-						esc_html__( 'Use tokens in your prompts: %s', 'auto-multi-meta' ),
-						'<code>{term_name}</code>, <code>{term_slug}</code>, <code>{taxonomy}</code>, <code>{product_list}</code>, <code>{post_title}</code>, <code>{post_excerpt}</code>, <code>{post_content}</code>, <code>{categories}</code>, <code>{tags}</code>, <code>{post_type}</code>'
-					);
-					?>
-				</p>
+printf( '</tbody></table>' );
 
-				<table class="form-table" role="presentation">
-					<tbody>
-						<tr>
-							<th scope="row">
-								<label for="amm-prompt-terms"><?php esc_html_e( 'Taxonomy Terms Prompt', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<textarea
-									name="<?php echo esc_attr( AMM_OPT_PROMPT_TEMPLATE_TERMS ); ?>"
-									id="amm-prompt-terms"
-									rows="5"
-									class="large-text"
-								><?php echo esc_textarea( $prompt_terms ); ?></textarea>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row">
-								<label for="amm-prompt-posts"><?php esc_html_e( 'Posts / Pages Prompt', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<textarea
-									name="<?php echo esc_attr( AMM_OPT_PROMPT_TEMPLATE_POSTS ); ?>"
-									id="amm-prompt-posts"
-									rows="5"
-									class="large-text"
-								><?php echo esc_textarea( $prompt_posts ); ?></textarea>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Overwrite Existing', 'auto-multi-meta' ); ?></th>
-							<td>
-								<label for="amm-overwrite">
-									<input
-										type="checkbox"
-										name="<?php echo esc_attr( AMM_OPT_OVERWRITE_EXISTING ); ?>"
-										id="amm-overwrite"
-										value="1"
-										<?php checked( $overwrite ); ?>
-									/>
-									<?php esc_html_e( 'Regenerate descriptions for items that already have one.', 'auto-multi-meta' ); ?>
-								</label>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+// Test Connection button.
+printf( '<div class="amm-test-connection">' );
+printf(
+	'<button type="button" id="amm-test-connection" class="button button-secondary">%s</button>',
+	esc_html__( 'Test Connection', 'auto-multi-meta' )
+);
+printf( '<span id="amm-test-result" class="amm-test-result" style="display:none;" aria-live="polite"></span>' );
+printf( '</div>' );
 
-			</div><!-- #settings-panel -->
+// Prompt Templates section.
+printf( '<h2>%s</h2>', esc_html__( 'Prompt Templates', 'auto-multi-meta' ) );
+printf(
+	'<p class="description">%s</p>',
+	sprintf(
+		/* translators: Placeholder token list. */
+		esc_html__( 'Use tokens in your prompts: %s', 'auto-multi-meta' ),
+		'<code>{term_name}</code>, <code>{term_slug}</code>, <code>{taxonomy}</code>, <code>{product_list}</code>, <code>{post_title}</code>, <code>{post_excerpt}</code>, <code>{post_content}</code>, <code>{categories}</code>, <code>{tags}</code>, <code>{post_type}</code>'
+	)
+);
 
-			<!-- ===== Taxonomies Tab ===== -->
-			<div id="taxonomies-panel" class="amm-tab-panel" style="display:none;">
-				<h2><?php esc_html_e( 'Enabled Taxonomies', 'auto-multi-meta' ); ?></h2>
-				<p class="description">
-					<?php esc_html_e( 'Select the taxonomies for which Auto Multi-Meta will generate meta descriptions on archive pages.', 'auto-multi-meta' ); ?>
-				</p>
-				<p>
-					<?php
-					printf(
-						'<a href="%s" class="button button-secondary">%s</a>',
-						esc_url( admin_url( 'tools.php?page=amm-term-manager' ) ),
-						esc_html__( 'Open Term Manager →', 'auto-multi-meta' )
-					);
-					?>
-				</p>
+printf( '<table class="form-table" role="presentation"><tbody>' );
 
-				<!-- Hidden flag: lets the sanitise callback detect when this tab was submitted. -->
-				<input type="hidden" name="amm_taxonomies_submitted" value="1" />
+// Terms prompt textarea.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-prompt-terms">%s</label>', esc_html__( 'Taxonomy Terms Prompt', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<textarea name="%s" id="amm-prompt-terms" rows="5" class="large-text">%s</textarea>',
+	esc_attr( AMM_OPT_PROMPT_TEMPLATE_TERMS ),
+	esc_textarea( $auto_multi_meta_prompt_terms )
+);
+printf( '</td></tr>' );
 
-				<?php if ( empty( $display_taxonomies ) ) : ?>
-				<p><?php esc_html_e( 'No public taxonomies found.', 'auto-multi-meta' ); ?></p>
-				<?php else : ?>
-				<div class="amm-checklist-actions">
-					<button type="button" class="button amm-check-all" data-group="taxonomies">
-						<?php esc_html_e( 'Check All', 'auto-multi-meta' ); ?>
-					</button>
-					<button type="button" class="button amm-uncheck-all" data-group="taxonomies">
-						<?php esc_html_e( 'Uncheck All', 'auto-multi-meta' ); ?>
-					</button>
-				</div>
-				<ul class="amm-checklist" id="amm-taxonomy-list">
-					<?php foreach ( $display_taxonomies as $amm_taxonomy ) : ?>
-					<li>
-						<label>
-							<input
-								type="checkbox"
-								name="<?php echo esc_attr( AMM_OPT_ENABLED_TAXONOMIES ); ?>[]"
-								value="<?php echo esc_attr( $amm_taxonomy->name ); ?>"
-								<?php checked( in_array( $amm_taxonomy->name, $enabled_taxonomies, true ) ); ?>
-							/>
-							<strong><?php echo esc_html( $amm_taxonomy->label ); ?></strong>
-							<code><?php echo esc_html( $amm_taxonomy->name ); ?></code>
-						</label>
-					</li>
-					<?php endforeach; ?>
-				</ul>
-				<?php endif; ?>
-			</div><!-- #taxonomies-panel -->
+// Posts prompt textarea.
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-prompt-posts">%s</label>', esc_html__( 'Posts / Pages Prompt', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<textarea name="%s" id="amm-prompt-posts" rows="5" class="large-text">%s</textarea>',
+	esc_attr( AMM_OPT_PROMPT_TEMPLATE_POSTS ),
+	esc_textarea( $auto_multi_meta_prompt_posts )
+);
+printf( '</td></tr>' );
 
-			<!-- ===== Post Types Tab ===== -->
-			<div id="post-types-panel" class="amm-tab-panel" style="display:none;">
-				<h2><?php esc_html_e( 'Enabled Post Types', 'auto-multi-meta' ); ?></h2>
-				<p class="description">
-					<?php esc_html_e( 'Select the post types for which Auto Multi-Meta will generate meta descriptions.', 'auto-multi-meta' ); ?>
-				</p>
-				<p>
-					<?php
-					printf(
-						'<a href="%s" class="button button-secondary">%s</a>',
-						esc_url( admin_url( 'tools.php?page=amm-post-manager' ) ),
-						esc_html__( 'Open Post Manager →', 'auto-multi-meta' )
-					);
-					?>
-				</p>
+// Overwrite existing checkbox.
+printf( '<tr><th scope="row">%s</th><td>', esc_html__( 'Overwrite Existing', 'auto-multi-meta' ) );
+printf(
+	'<label for="amm-overwrite"><input type="checkbox" name="%s" id="amm-overwrite" value="1"%s /> %s</label>',
+	esc_attr( AMM_OPT_OVERWRITE_EXISTING ),
+	checked( $auto_multi_meta_overwrite, true, false ),
+	esc_html__( 'Regenerate descriptions for items that already have one.', 'auto-multi-meta' )
+);
+printf( '</td></tr>' );
 
-				<!-- Hidden flag: lets the sanitise callback detect when this tab was submitted. -->
-				<input type="hidden" name="amm_post_types_submitted" value="1" />
+printf( '</tbody></table>' );
+printf( '</div>' );
 
-				<?php if ( empty( $display_post_types ) ) : ?>
-				<p><?php esc_html_e( 'No public post types found.', 'auto-multi-meta' ); ?></p>
-				<?php else : ?>
-				<div class="amm-checklist-actions">
-					<button type="button" class="button amm-check-all" data-group="post-types">
-						<?php esc_html_e( 'Check All', 'auto-multi-meta' ); ?>
-					</button>
-					<button type="button" class="button amm-uncheck-all" data-group="post-types">
-						<?php esc_html_e( 'Uncheck All', 'auto-multi-meta' ); ?>
-					</button>
-				</div>
-				<ul class="amm-checklist" id="amm-post-type-list">
-					<?php foreach ( $display_post_types as $amm_post_type ) : ?>
-					<li>
-						<label>
-							<input
-								type="checkbox"
-								name="<?php echo esc_attr( AMM_OPT_ENABLED_POST_TYPES ); ?>[]"
-								value="<?php echo esc_attr( $amm_post_type->name ); ?>"
-								<?php checked( in_array( $amm_post_type->name, $enabled_post_types, true ) ); ?>
-							/>
-							<strong><?php echo esc_html( $amm_post_type->label ); ?></strong>
-							<code><?php echo esc_html( $amm_post_type->name ); ?></code>
-						</label>
-					</li>
-					<?php endforeach; ?>
-				</ul>
-				<?php endif; ?>
-			</div><!-- #post-types-panel -->
+// ===== Taxonomies Tab =====
+printf( '<div id="taxonomies-panel" class="amm-tab-panel" style="display:none;">' );
+printf( '<h2>%s</h2>', esc_html__( 'Enabled Taxonomies', 'auto-multi-meta' ) );
+printf(
+	'<p class="description">%s</p>',
+	esc_html__( 'Select the taxonomies for which Auto Multi-Meta will generate meta descriptions on archive pages.', 'auto-multi-meta' )
+);
+printf(
+	'<p><a href="%s" class="button button-secondary">%s</a></p>',
+	esc_url( admin_url( 'tools.php?page=amm-term-manager' ) ),
+	esc_html__( 'Open Term Manager →', 'auto-multi-meta' )
+);
 
-			<!-- ===== Log Tab ===== -->
-			<div id="log-panel" class="amm-tab-panel" style="display:none;">
-				<h2><?php esc_html_e( 'Activity Log', 'auto-multi-meta' ); ?></h2>
+// Hidden flag: lets the sanitise callback detect when this tab was submitted.
+printf( '<input type="hidden" name="amm_taxonomies_submitted" value="1" />' );
 
-				<?php if ( empty( $generation_log ) ) : ?>
-				<p class="description">
-					<?php esc_html_e( 'No generation activity yet. Activity will appear here once you start generating meta descriptions.', 'auto-multi-meta' ); ?>
-				</p>
-				<?php else : ?>
-				<p class="description">
-					<?php
-					printf(
-						/* translators: %d: number of log entries shown. */
-						esc_html__( 'Showing %d most recent generation attempts (newest first).', 'auto-multi-meta' ),
-						count( $generation_log )
-					);
-					?>
-				</p>
-				<table class="wp-list-table widefat fixed striped amm-log-table">
-					<thead>
-						<tr>
-							<th class="column-timestamp"><?php esc_html_e( 'Date / Time', 'auto-multi-meta' ); ?></th>
-							<th class="column-type"><?php esc_html_e( 'Type', 'auto-multi-meta' ); ?></th>
-							<th class="column-id"><?php esc_html_e( 'ID', 'auto-multi-meta' ); ?></th>
-							<th class="column-provider"><?php esc_html_e( 'Provider', 'auto-multi-meta' ); ?></th>
-							<th class="column-model"><?php esc_html_e( 'Model', 'auto-multi-meta' ); ?></th>
-							<th class="column-status"><?php esc_html_e( 'Status', 'auto-multi-meta' ); ?></th>
-							<th class="column-message"><?php esc_html_e( 'Message', 'auto-multi-meta' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $generation_log as $amm_entry ) : ?>
-							<?php
-							$amm_e_type     = isset( $amm_entry['type'] ) ? sanitize_key( $amm_entry['type'] ) : '';
-							$amm_e_id       = isset( $amm_entry['id'] ) ? (int) $amm_entry['id'] : 0;
-							$amm_e_taxonomy = isset( $amm_entry['taxonomy'] ) ? sanitize_key( $amm_entry['taxonomy'] ) : '';
-							$amm_e_provider = isset( $amm_entry['provider'] ) ? sanitize_key( $amm_entry['provider'] ) : '';
-							$amm_e_model    = isset( $amm_entry['model'] ) ? sanitize_text_field( $amm_entry['model'] ) : '';
-							$amm_e_status   = isset( $amm_entry['status'] ) ? sanitize_key( $amm_entry['status'] ) : '';
-							$amm_e_message  = isset( $amm_entry['message'] ) ? sanitize_text_field( $amm_entry['message'] ) : '';
-							$amm_e_ts       = isset( $amm_entry['timestamp'] ) ? sanitize_text_field( $amm_entry['timestamp'] ) : '';
+if ( empty( $auto_multi_meta_display_taxonomies ) ) {
+	printf( '<p>%s</p>', esc_html__( 'No public taxonomies found.', 'auto-multi-meta' ) );
+} else {
+	printf( '<div class="amm-checklist-actions">' );
+	printf(
+		'<button type="button" class="button amm-check-all" data-group="taxonomies">%s</button>',
+		esc_html__( 'Check All', 'auto-multi-meta' )
+	);
+	printf(
+		'<button type="button" class="button amm-uncheck-all" data-group="taxonomies">%s</button>',
+		esc_html__( 'Uncheck All', 'auto-multi-meta' )
+	);
+	printf( '</div>' );
 
-							$amm_status_class = 'generated' === $amm_e_status ? 'amm-status-ok' : ( 'error' === $amm_e_status ? 'amm-status-error' : 'amm-status-skip' );
-							$amm_type_label   = 'term' === $amm_e_type && '' !== $amm_e_taxonomy
-							? 'term (' . $amm_e_taxonomy . ')'
-							: $amm_e_type;
-							?>
-						<tr>
-							<td><?php echo esc_html( $amm_e_ts ); ?></td>
-							<td><?php echo esc_html( $amm_type_label ); ?></td>
-							<td><?php echo esc_html( (string) $amm_e_id ); ?></td>
-							<td><?php echo esc_html( $amm_e_provider ); ?></td>
-							<td><code><?php echo esc_html( $amm_e_model ); ?></code></td>
-							<td>
-								<?php
-								printf(
-									'<span class="amm-status-badge %s">%s</span>',
-									esc_attr( $amm_status_class ),
-									esc_html( $amm_e_status )
-								);
-								?>
-							</td>
-							<td class="column-message"><?php echo esc_html( $amm_e_message ); ?></td>
-						</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-				<?php endif; ?>
+	printf( '<ul class="amm-checklist" id="amm-taxonomy-list">' );
+	foreach ( $auto_multi_meta_display_taxonomies as $auto_multi_meta_taxonomy ) {
+		printf(
+			'<li><label><input type="checkbox" name="%s[]" value="%s"%s /> <strong>%s</strong> <code>%s</code></label></li>',
+			esc_attr( AMM_OPT_ENABLED_TAXONOMIES ),
+			esc_attr( $auto_multi_meta_taxonomy->name ),
+			checked( in_array( $auto_multi_meta_taxonomy->name, $auto_multi_meta_enabled_taxonomies, true ), true, false ),
+			esc_html( $auto_multi_meta_taxonomy->label ),
+			esc_html( $auto_multi_meta_taxonomy->name )
+		);
+	}
+	printf( '</ul>' );
+}
 
-			</div><!-- #log-panel -->
+printf( '</div>' );
 
-			<!-- ===== Batch Tab ===== -->
-			<div id="batch-panel" class="amm-tab-panel" style="display:none;">
-				<h2><?php esc_html_e( 'Background Batch Processing', 'auto-multi-meta' ); ?></h2>
-				<p class="description">
-					<?php esc_html_e( 'Run a background job to generate meta descriptions for all items that are missing one. The job runs in the background via Action Scheduler (or WP-Cron as a fallback) — you can close this page and return later to check progress.', 'auto-multi-meta' ); ?>
-				</p>
+// ===== Post Types Tab =====
+printf( '<div id="post-types-panel" class="amm-tab-panel" style="display:none;">' );
+printf( '<h2>%s</h2>', esc_html__( 'Enabled Post Types', 'auto-multi-meta' ) );
+printf(
+	'<p class="description">%s</p>',
+	esc_html__( 'Select the post types for which Auto Multi-Meta will generate meta descriptions.', 'auto-multi-meta' )
+);
+printf(
+	'<p><a href="%s" class="button button-secondary">%s</a></p>',
+	esc_url( admin_url( 'tools.php?page=amm-post-manager' ) ),
+	esc_html__( 'Open Post Manager →', 'auto-multi-meta' )
+);
 
-				<h3><?php esc_html_e( 'Rate Limiting', 'auto-multi-meta' ); ?></h3>
-				<table class="form-table" role="presentation">
-					<tbody>
-						<tr>
-							<th scope="row">
-								<label for="amm-batch-delay-input"><?php esc_html_e( 'Delay Between Requests', 'auto-multi-meta' ); ?></label>
-							</th>
-							<td>
-								<input
-									type="number"
-									name="<?php echo esc_attr( AMM_OPT_BATCH_DELAY ); ?>"
-									id="amm-batch-delay-input"
-									value="<?php echo esc_attr( (string) $batch_delay ); ?>"
-									class="small-text"
-									min="0"
-									max="60"
-									step="1"
-								/>
-								<?php esc_html_e( 'seconds', 'auto-multi-meta' ); ?>
-								<p class="description">
-									<?php esc_html_e( 'Pause between each AI API call to avoid rate limiting (0–60 seconds). Default: 5 seconds.', 'auto-multi-meta' ); ?>
-								</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+// Hidden flag: lets the sanitise callback detect when this tab was submitted.
+printf( '<input type="hidden" name="amm_post_types_submitted" value="1" />' );
 
-				<h3><?php esc_html_e( 'Generate All Missing', 'auto-multi-meta' ); ?></h3>
-				<p class="description">
-					<?php esc_html_e( 'Queues all enabled taxonomies and post types that are missing meta descriptions. Save your settings first if you have made changes above.', 'auto-multi-meta' ); ?>
-				</p>
+if ( empty( $auto_multi_meta_display_post_types ) ) {
+	printf( '<p>%s</p>', esc_html__( 'No public post types found.', 'auto-multi-meta' ) );
+} else {
+	printf( '<div class="amm-checklist-actions">' );
+	printf(
+		'<button type="button" class="button amm-check-all" data-group="post-types">%s</button>',
+		esc_html__( 'Check All', 'auto-multi-meta' )
+	);
+	printf(
+		'<button type="button" class="button amm-uncheck-all" data-group="post-types">%s</button>',
+		esc_html__( 'Uncheck All', 'auto-multi-meta' )
+	);
+	printf( '</div>' );
 
-				<div class="amm-batch-controls">
-					<?php
-					printf(
-						'<select id="amm-batch-type-select" class="amm-batch-type-select"><option value="all">%s</option><option value="term">%s</option><option value="post">%s</option></select>',
-						esc_html__( 'Terms &amp; Posts', 'auto-multi-meta' ),
-						esc_html__( 'Terms only', 'auto-multi-meta' ),
-						esc_html__( 'Posts only', 'auto-multi-meta' )
-					);
-					?>
-					<input type="hidden" id="amm-batch-type" value="all" />
-					<?php
-					printf(
-						'<button type="button" id="amm-batch-start" class="button button-primary">%s</button>',
-						esc_html__( 'Generate All Missing', 'auto-multi-meta' )
-					);
-					printf(
-						'<button type="button" id="amm-batch-cancel" class="button button-secondary" style="display:none;">%s</button>',
-						esc_html__( 'Cancel Batch', 'auto-multi-meta' )
-					);
-					?>
-				</div>
+	printf( '<ul class="amm-checklist" id="amm-post-type-list">' );
+	foreach ( $auto_multi_meta_display_post_types as $auto_multi_meta_post_type ) {
+		printf(
+			'<li><label><input type="checkbox" name="%s[]" value="%s"%s /> <strong>%s</strong> <code>%s</code></label></li>',
+			esc_attr( AMM_OPT_ENABLED_POST_TYPES ),
+			esc_attr( $auto_multi_meta_post_type->name ),
+			checked( in_array( $auto_multi_meta_post_type->name, $auto_multi_meta_enabled_post_types, true ), true, false ),
+			esc_html( $auto_multi_meta_post_type->label ),
+			esc_html( $auto_multi_meta_post_type->name )
+		);
+	}
+	printf( '</ul>' );
+}
 
-				<div id="amm-batch-progress-wrap" class="amm-batch-progress-wrap" style="display:none;">
-					<div class="amm-batch-bar-track">
-						<div id="amm-batch-bar" class="amm-batch-bar" style="width:0%;"></div>
-					</div>
-					<p id="amm-batch-status" class="amm-batch-status" aria-live="polite"></p>
-				</div>
+printf( '</div>' );
 
-			</div><!-- #batch-panel -->
+// ===== Log Tab =====
+printf( '<div id="log-panel" class="amm-tab-panel" style="display:none;">' );
+printf( '<h2>%s</h2>', esc_html__( 'Activity Log', 'auto-multi-meta' ) );
 
-		</div><!-- .amm-tab-content -->
+if ( empty( $auto_multi_meta_generation_log ) ) {
+	printf(
+		'<p class="description">%s</p>',
+		esc_html__( 'No generation activity yet. Activity will appear here once you start generating meta descriptions.', 'auto-multi-meta' )
+	);
+} else {
+	printf(
+		'<p class="description">%s</p>',
+		sprintf(
+			/* translators: %d: number of log entries shown. */
+			esc_html__( 'Showing %d most recent generation attempts (newest first).', 'auto-multi-meta' ),
+			count( $auto_multi_meta_generation_log )
+		)
+	);
 
-		<?php submit_button( __( 'Save Settings', 'auto-multi-meta' ) ); ?>
+	printf( '<table class="wp-list-table widefat fixed striped amm-log-table">' );
+	printf( '<thead><tr>' );
+	printf( '<th class="column-timestamp">%s</th>', esc_html__( 'Date / Time', 'auto-multi-meta' ) );
+	printf( '<th class="column-type">%s</th>', esc_html__( 'Type', 'auto-multi-meta' ) );
+	printf( '<th class="column-id">%s</th>', esc_html__( 'ID', 'auto-multi-meta' ) );
+	printf( '<th class="column-provider">%s</th>', esc_html__( 'Provider', 'auto-multi-meta' ) );
+	printf( '<th class="column-model">%s</th>', esc_html__( 'Model', 'auto-multi-meta' ) );
+	printf( '<th class="column-status">%s</th>', esc_html__( 'Status', 'auto-multi-meta' ) );
+	printf( '<th class="column-message">%s</th>', esc_html__( 'Message', 'auto-multi-meta' ) );
+	printf( '</tr></thead><tbody>' );
 
-	</form><!-- #amm-settings-form -->
-</div><!-- .amm-wrap -->
-<?php
-// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	foreach ( $auto_multi_meta_generation_log as $auto_multi_meta_entry ) {
+		$auto_multi_meta_e_type     = isset( $auto_multi_meta_entry['type'] ) ? sanitize_key( $auto_multi_meta_entry['type'] ) : '';
+		$auto_multi_meta_e_id       = isset( $auto_multi_meta_entry['id'] ) ? (int) $auto_multi_meta_entry['id'] : 0;
+		$auto_multi_meta_e_taxonomy = isset( $auto_multi_meta_entry['taxonomy'] ) ? sanitize_key( $auto_multi_meta_entry['taxonomy'] ) : '';
+		$auto_multi_meta_e_provider = isset( $auto_multi_meta_entry['provider'] ) ? sanitize_key( $auto_multi_meta_entry['provider'] ) : '';
+		$auto_multi_meta_e_model    = isset( $auto_multi_meta_entry['model'] ) ? sanitize_text_field( $auto_multi_meta_entry['model'] ) : '';
+		$auto_multi_meta_e_status   = isset( $auto_multi_meta_entry['status'] ) ? sanitize_key( $auto_multi_meta_entry['status'] ) : '';
+		$auto_multi_meta_e_message  = isset( $auto_multi_meta_entry['message'] ) ? sanitize_text_field( $auto_multi_meta_entry['message'] ) : '';
+		$auto_multi_meta_e_ts       = isset( $auto_multi_meta_entry['timestamp'] ) ? sanitize_text_field( $auto_multi_meta_entry['timestamp'] ) : '';
+
+		$auto_multi_meta_status_class = 'generated' === $auto_multi_meta_e_status ? 'amm-status-ok' : ( 'error' === $auto_multi_meta_e_status ? 'amm-status-error' : 'amm-status-skip' );
+		$auto_multi_meta_type_label   = 'term' === $auto_multi_meta_e_type && '' !== $auto_multi_meta_e_taxonomy
+			? 'term (' . $auto_multi_meta_e_taxonomy . ')'
+			: $auto_multi_meta_e_type;
+
+		printf( '<tr>' );
+		printf( '<td>%s</td>', esc_html( $auto_multi_meta_e_ts ) );
+		printf( '<td>%s</td>', esc_html( $auto_multi_meta_type_label ) );
+		printf( '<td>%s</td>', esc_html( (string) $auto_multi_meta_e_id ) );
+		printf( '<td>%s</td>', esc_html( $auto_multi_meta_e_provider ) );
+		printf( '<td><code>%s</code></td>', esc_html( $auto_multi_meta_e_model ) );
+		printf(
+			'<td><span class="amm-status-badge %s">%s</span></td>',
+			esc_attr( $auto_multi_meta_status_class ),
+			esc_html( $auto_multi_meta_e_status )
+		);
+		printf( '<td class="column-message">%s</td>', esc_html( $auto_multi_meta_e_message ) );
+		printf( '</tr>' );
+	}
+
+	printf( '</tbody></table>' );
+}
+
+printf( '</div>' );
+
+// ===== Batch Tab =====
+printf( '<div id="batch-panel" class="amm-tab-panel" style="display:none;">' );
+printf( '<h2>%s</h2>', esc_html__( 'Background Batch Processing', 'auto-multi-meta' ) );
+printf(
+	'<p class="description">%s</p>',
+	esc_html__( 'Run a background job to generate meta descriptions for all items that are missing one. The job runs in the background via Action Scheduler (or WP-Cron as a fallback) — you can close this page and return later to check progress.', 'auto-multi-meta' )
+);
+
+// Rate Limiting.
+printf( '<h3>%s</h3>', esc_html__( 'Rate Limiting', 'auto-multi-meta' ) );
+printf( '<table class="form-table" role="presentation"><tbody>' );
+printf( '<tr><th scope="row">' );
+printf( '<label for="amm-batch-delay-input">%s</label>', esc_html__( 'Delay Between Requests', 'auto-multi-meta' ) );
+printf( '</th><td>' );
+printf(
+	'<input type="number" name="%s" id="amm-batch-delay-input" value="%s" class="small-text" min="0" max="60" step="1" />',
+	esc_attr( AMM_OPT_BATCH_DELAY ),
+	esc_attr( (string) $auto_multi_meta_batch_delay )
+);
+printf( ' %s', esc_html__( 'seconds', 'auto-multi-meta' ) );
+printf( '<p class="description">%s</p>', esc_html__( 'Pause between each AI API call to avoid rate limiting (0–60 seconds). Default: 5 seconds.', 'auto-multi-meta' ) );
+printf( '</td></tr>' );
+printf( '</tbody></table>' );
+
+// Generate All Missing.
+printf( '<h3>%s</h3>', esc_html__( 'Generate All Missing', 'auto-multi-meta' ) );
+printf(
+	'<p class="description">%s</p>',
+	esc_html__( 'Queues all enabled taxonomies and post types that are missing meta descriptions. Save your settings first if you have made changes above.', 'auto-multi-meta' )
+);
+
+printf( '<div class="amm-batch-controls">' );
+printf(
+	'<select id="amm-batch-type-select" class="amm-batch-type-select"><option value="all">%s</option><option value="term">%s</option><option value="post">%s</option></select>',
+	esc_html__( 'Terms &amp; Posts', 'auto-multi-meta' ),
+	esc_html__( 'Terms only', 'auto-multi-meta' ),
+	esc_html__( 'Posts only', 'auto-multi-meta' )
+);
+printf( '<input type="hidden" id="amm-batch-type" value="all" />' );
+printf(
+	'<button type="button" id="amm-batch-start" class="button button-primary">%s</button>',
+	esc_html__( 'Generate All Missing', 'auto-multi-meta' )
+);
+printf(
+	'<button type="button" id="amm-batch-cancel" class="button button-secondary" style="display:none;">%s</button>',
+	esc_html__( 'Cancel Batch', 'auto-multi-meta' )
+);
+printf( '</div>' );
+
+printf( '<div id="amm-batch-progress-wrap" class="amm-batch-progress-wrap" style="display:none;">' );
+printf( '<div class="amm-batch-bar-track">' );
+printf( '<div id="amm-batch-bar" class="amm-batch-bar" style="width:0%%;"></div>' );
+printf( '</div>' );
+printf( '<p id="amm-batch-status" class="amm-batch-status" aria-live="polite"></p>' );
+printf( '</div>' );
+
+printf( '</div>' );
+
+printf( '</div>' );
+
+submit_button( __( 'Save Settings', 'auto-multi-meta' ) );
+
+printf( '</form>' );
+printf( '</div>' );
