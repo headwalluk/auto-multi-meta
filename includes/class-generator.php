@@ -115,7 +115,9 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			$description = trim( $ai_output );
+			// Strip any HTML tags and decode entities the AI may have returned.
+			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
+			$description = trim( $description );
 			$validation  = $this->validate_description( $description );
 			if ( is_wp_error( $validation ) ) {
 				$result = $this->make_error_result( $validation->get_error_message() );
@@ -210,7 +212,9 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			$description = trim( $ai_output );
+			// Strip any HTML tags and decode entities the AI may have returned.
+			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
+			$description = trim( $description );
 			$validation  = $this->validate_description( $description );
 			if ( is_wp_error( $validation ) ) {
 				$result = $this->make_error_result( $validation->get_error_message() );
@@ -281,7 +285,9 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			$description = trim( $ai_output );
+			// Strip any HTML tags and decode entities the AI may have returned.
+			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
+			$description = trim( $description );
 			$validation  = $this->validate_description( $description );
 
 			if ( is_wp_error( $validation ) ) {
@@ -341,7 +347,9 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			$description = trim( $ai_output );
+			// Strip any HTML tags and decode entities the AI may have returned.
+			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
+			$description = trim( $description );
 			$validation  = $this->validate_description( $description );
 
 			if ( is_wp_error( $validation ) ) {

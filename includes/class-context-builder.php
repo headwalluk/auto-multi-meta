@@ -49,13 +49,18 @@ class Context_Builder {
 				? $taxonomy_obj->labels->singular_name
 				: $taxonomy;
 
+			$sample_titles = $this->get_term_sample_titles( $term_id, $taxonomy );
+
 			$context = array(
 				'term_name'      => $term->name,
 				'term_slug'      => $term->slug,
 				'taxonomy'       => $taxonomy,
 				'taxonomy_label' => $taxonomy_label,
 				'description'    => wp_strip_all_tags( $term->description ),
-				'product_list'   => $this->get_term_sample_titles( $term_id, $taxonomy ),
+				// Provide a meaningful fallback when the term has no published items.
+				'product_list'   => '' !== $sample_titles
+					? $sample_titles
+					: __( 'no items currently listed', 'auto-multi-meta' ),
 			);
 
 			// Attempt loopback fetch to augment context with frontend HTML.
@@ -106,8 +111,9 @@ class Context_Builder {
 			}
 
 			// Strip HTML from content and truncate to configured limit.
+			// Use mb_substr to avoid splitting multibyte characters.
 			$content = wp_strip_all_tags( $post->post_content );
-			$content = substr( $content, 0, AMM_CONTEXT_MAX_CONTENT_CHARS );
+			$content = mb_substr( $content, 0, AMM_CONTEXT_MAX_CONTENT_CHARS );
 
 			$context = array(
 				'post_title'      => $post->post_title,
