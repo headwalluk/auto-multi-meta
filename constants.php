@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die();
 // short-prefix detection behaviour (AMM = 3 chars), but the prefix is correctly applied.
 
 // Plugin metadata.
-define( 'AMM_VERSION', '0.3.0' );
+define( 'AMM_VERSION', '0.4.0' );
 define( 'AMM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AMM_URL', plugin_dir_url( __FILE__ ) );
 
@@ -28,19 +28,21 @@ define( 'AMM_OPT_PROMPT_TEMPLATE_TERMS', 'amm_prompt_template_terms' );
 define( 'AMM_OPT_PROMPT_TEMPLATE_POSTS', 'amm_prompt_template_posts' );
 define( 'AMM_OPT_MAX_TOKENS', 'amm_max_tokens' );
 define( 'AMM_OPT_OVERWRITE_EXISTING', 'amm_overwrite_existing' );
+define( 'AMM_OPT_USE_SITE_LANGUAGE', 'amm_use_site_language' );
 
 // Default values.
 define( 'AMM_DEFAULT_API_PROVIDER', 'openai' );
 define( 'AMM_DEFAULT_MODEL', 'gpt-4o-mini' );
 define( 'AMM_DEFAULT_MAX_TOKENS', 300 );
 define( 'AMM_DEFAULT_OVERWRITE_EXISTING', false );
+define( 'AMM_DEFAULT_USE_SITE_LANGUAGE', true );
 define(
 	'AMM_DEFAULT_PROMPT_TEMPLATE_TERMS',
-	'Write a concise SEO meta description (150-160 characters) for a {taxonomy} archive page titled "{term_name}". This page lists products/posts including: {product_list}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Do not use quotes in the output.'
+	'Write a concise SEO meta description (150-160 characters) for a {taxonomy} archive page titled "{term_name}". This page lists products/posts including: {product_list}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Output ONLY the plain text description — no headings, labels, markdown, character counts, or quotes.'
 );
 define(
 	'AMM_DEFAULT_PROMPT_TEMPLATE_POSTS',
-	'Write a concise SEO meta description (150-160 characters) for a {post_type} titled "{post_title}". Summary: {post_excerpt}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Do not use quotes in the output.'
+	'Write a concise SEO meta description (150-160 characters) for a {post_type} titled "{post_title}". Summary: {post_excerpt}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Output ONLY the plain text description — no headings, labels, markdown, character counts, or quotes.'
 );
 
 // HTTP timeout (seconds) for outbound AI API requests.

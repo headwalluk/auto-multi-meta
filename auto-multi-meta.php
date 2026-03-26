@@ -3,7 +3,7 @@
  * Plugin Name: Auto Multi-Meta
  * Plugin URI: https://headwall-hosting.com/
  * Description: Automatically generates SEO meta descriptions for taxonomy term archives and post types using AI (OpenAI, Anthropic, OpenRouter).
- * Version: 0.3.0
+ * Version: 0.4.0
  * Requires at least: 6.4
  * Requires PHP: 8.0
  * Author: Paul Faulkner
@@ -34,6 +34,10 @@ require_once AMM_DIR . 'includes/class-post-manager.php';
 require_once AMM_DIR . 'includes/class-batch-processor.php';
 require_once AMM_DIR . 'includes/class-admin-hooks.php';
 require_once AMM_DIR . 'includes/class-plugin.php';
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once AMM_DIR . 'includes/class-cli.php';
+}
 
 /**
  * Boots the plugin.

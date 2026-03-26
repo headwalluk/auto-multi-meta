@@ -104,6 +104,15 @@ class Settings {
 
 		register_setting(
 			self::OPTION_GROUP,
+			AMM_OPT_USE_SITE_LANGUAGE,
+			[
+				'sanitize_callback' => [ $this, 'sanitize_checkbox' ],
+				'default'           => AMM_DEFAULT_USE_SITE_LANGUAGE,
+			]
+		);
+
+		register_setting(
+			self::OPTION_GROUP,
 			AMM_OPT_ENABLED_TAXONOMIES,
 			[
 				'sanitize_callback' => [ $this, 'sanitize_enabled_taxonomies' ],

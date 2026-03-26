@@ -115,9 +115,7 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			// Strip any HTML tags and decode entities the AI may have returned.
-			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
-			$description = trim( $description );
+			$description = $this->clean_ai_output( $ai_output );
 			$validation  = $this->validate_description( $description );
 			if ( is_wp_error( $validation ) ) {
 				$result = $this->make_error_result( $validation->get_error_message() );
@@ -212,9 +210,7 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			// Strip any HTML tags and decode entities the AI may have returned.
-			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
-			$description = trim( $description );
+			$description = $this->clean_ai_output( $ai_output );
 			$validation  = $this->validate_description( $description );
 			if ( is_wp_error( $validation ) ) {
 				$result = $this->make_error_result( $validation->get_error_message() );
@@ -285,9 +281,7 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			// Strip any HTML tags and decode entities the AI may have returned.
-			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
-			$description = trim( $description );
+			$description = $this->clean_ai_output( $ai_output );
 			$validation  = $this->validate_description( $description );
 
 			if ( is_wp_error( $validation ) ) {
@@ -347,9 +341,7 @@ class Generator {
 
 		// Validate the response length.
 		if ( is_null( $result ) ) {
-			// Strip any HTML tags and decode entities the AI may have returned.
-			$description = wp_strip_all_tags( html_entity_decode( $ai_output, ENT_QUOTES, 'UTF-8' ) );
-			$description = trim( $description );
+			$description = $this->clean_ai_output( $ai_output );
 			$validation  = $this->validate_description( $description );
 
 			if ( is_wp_error( $validation ) ) {
@@ -440,6 +432,40 @@ class Generator {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Cleans markdown and meta artifacts from an AI response.
+	 *
+	 * Strips markdown headings, bold/italic markers, trailing character count
+	 * lines, and label prefixes that some models add despite instructions.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $text Raw AI output.
+	 *
+	 * @return string Cleaned plain text.
+	 */
+	private function clean_ai_output( string $text ): string {
+		// Strip HTML tags and decode entities.
+		$text = wp_strip_all_tags( html_entity_decode( $text, ENT_QUOTES, 'UTF-8' ) );
+
+		// Remove markdown headings (e.g. "# Meta Description\n").
+		$text = preg_replace( '/^#{1,6}\s+.*\n?/m', '', $text );
+
+		// Remove bold/italic markdown markers.
+		$text = preg_replace( '/\*{1,3}(.*?)\*{1,3}/', '$1', $text );
+
+		// Remove trailing character count lines (e.g. "Character count: 157", "(157 characters)").
+		$text = preg_replace( '/\n?\s*\(?\s*(?:character\s*count|char(?:acter)?s?)\s*[:=]?\s*\d+\s*\)?\s*$/i', '', $text );
+
+		// Remove leading label prefixes (e.g. "Meta Description:" or "SEO Description:").
+		$text = preg_replace( '/^(?:meta|seo)\s+description\s*[:—–-]\s*/i', '', $text );
+
+		// Collapse any remaining multiple whitespace/newlines into single spaces.
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
 	}
 
 	/**

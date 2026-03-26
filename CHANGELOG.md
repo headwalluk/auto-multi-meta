@@ -6,6 +6,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.4.0] — 2026-03-26
+
+### Added
+
+- **WP-CLI commands** — `wp amm status`, `wp amm list terms|posts`, `wp amm generate term|post|terms|posts` with `--force`, `--dry-run`, `--delay`, `--status`, `--format` flags, progress bars for bulk operations
+- **Site language setting** — checkbox (default on) appends locale-aware spelling instructions (e.g. "Use United Kingdom English spelling") to AI prompts based on `get_locale()`
+- **AI response cleaning** — `clean_ai_output()` strips markdown headings, bold/italic markers, character count lines, and label prefixes that some models add despite instructions
+- **GitHub Actions release workflow** — builds distribution zip on tag push via `.github/workflows/release.yml`
+- `docs/wp-cli.md` — full WP-CLI command reference
+
+### Changed
+
+- Default prompt templates now explicitly instruct the AI to output only plain text (no headings, labels, markdown, character counts, or quotes)
+- README.md updated with TSF support, WP-CLI, and site language awareness in feature list
+
+---
+
 ## [0.3.0] — 2026-03-26
 
 ### Added

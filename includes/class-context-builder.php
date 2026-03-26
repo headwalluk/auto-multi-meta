@@ -167,6 +167,7 @@ class Context_Builder {
 			}
 
 			$result = $this->replace_tokens( $template, $context );
+			$result = $this->maybe_append_language_instruction( $result );
 		}
 
 		return $result;
@@ -199,6 +200,39 @@ class Context_Builder {
 			}
 
 			$result = $this->replace_tokens( $template, $context );
+			$result = $this->maybe_append_language_instruction( $result );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Appends a language instruction to the prompt when the site language option is enabled.
+	 *
+	 * Uses the WordPress locale to build a human-readable language name
+	 * (e.g. "British English", "Portuguese (Brazil)") via the intl extension.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $prompt The prompt to potentially append to.
+	 *
+	 * @return string The prompt, possibly with a language instruction appended.
+	 */
+	private function maybe_append_language_instruction( string $prompt ): string {
+		$use_language = (bool) get_option( AMM_OPT_USE_SITE_LANGUAGE, AMM_DEFAULT_USE_SITE_LANGUAGE );
+		$result       = $prompt;
+
+		if ( $use_language ) {
+			$locale        = get_locale();
+			$language_name = locale_get_display_language( $locale, 'en' );
+			$region_name   = locale_get_display_region( $locale, 'en' );
+			$label         = $language_name;
+
+			if ( '' !== $region_name ) {
+				$label = $region_name . ' ' . $language_name;
+			}
+
+			$result = $prompt . ' Use ' . $label . ' spelling.';
 		}
 
 		return $result;

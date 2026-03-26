@@ -22,6 +22,7 @@ $auto_multi_meta_max_tokens         = (int) get_option( AMM_OPT_MAX_TOKENS, AMM_
 $auto_multi_meta_prompt_terms       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_TERMS, AMM_DEFAULT_PROMPT_TEMPLATE_TERMS );
 $auto_multi_meta_prompt_posts       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_POSTS, AMM_DEFAULT_PROMPT_TEMPLATE_POSTS );
 $auto_multi_meta_overwrite          = (bool) get_option( AMM_OPT_OVERWRITE_EXISTING, AMM_DEFAULT_OVERWRITE_EXISTING );
+$auto_multi_meta_use_site_language  = (bool) get_option( AMM_OPT_USE_SITE_LANGUAGE, AMM_DEFAULT_USE_SITE_LANGUAGE );
 $auto_multi_meta_batch_delay        = (int) get_option( AMM_OPT_BATCH_DELAY, AMM_DEFAULT_BATCH_DELAY );
 $auto_multi_meta_generation_log     = (array) get_option( AMM_OPT_GENERATION_LOG, [] );
 
@@ -207,6 +208,29 @@ printf(
 	esc_attr( AMM_OPT_OVERWRITE_EXISTING ),
 	checked( $auto_multi_meta_overwrite, true, false ),
 	esc_html__( 'Regenerate descriptions for items that already have one.', 'auto-multi-meta' )
+);
+printf( '</td></tr>' );
+
+// Site language checkbox.
+$auto_multi_meta_locale        = get_locale();
+$auto_multi_meta_language_name = locale_get_display_language( $auto_multi_meta_locale, $auto_multi_meta_locale );
+$auto_multi_meta_region_name   = locale_get_display_region( $auto_multi_meta_locale, $auto_multi_meta_locale );
+$auto_multi_meta_lang_label    = $auto_multi_meta_language_name;
+
+if ( '' !== $auto_multi_meta_region_name ) {
+	$auto_multi_meta_lang_label = $auto_multi_meta_language_name . ' (' . $auto_multi_meta_region_name . ')';
+}
+
+printf( '<tr><th scope="row">%s</th><td>', esc_html__( 'Site Language', 'auto-multi-meta' ) );
+printf(
+	'<label for="amm-use-site-language"><input type="checkbox" name="%s" id="amm-use-site-language" value="1"%s /> %s</label>',
+	esc_attr( AMM_OPT_USE_SITE_LANGUAGE ),
+	checked( $auto_multi_meta_use_site_language, true, false ),
+	sprintf(
+		/* translators: %s: Language name e.g. "British English" or "Portuguese (Brazil)". */
+		esc_html__( 'Use %s spelling in generated meta descriptions.', 'auto-multi-meta' ),
+		'<strong>' . esc_html( $auto_multi_meta_lang_label ) . '</strong>'
+	)
 );
 printf( '</td></tr>' );
 

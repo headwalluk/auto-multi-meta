@@ -1,9 +1,9 @@
 # Project Tracker
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 **Last Updated:** 2026-03-26
 **Current Phase:** Complete
-**Overall Progress:** 10/10 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ✅, M8 ✅, M9 ✅, M10 ✅
+**Overall Progress:** 11/11 milestones complete — M1 ✅, M2 ✅, M3 ✅, M4 ✅, M5 ✅, M6 ✅, M7 ✅, M8 ✅, M9 ✅, M10 ✅, M11 ✅
 
 ---
 
@@ -36,7 +36,8 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] M7: Polish, testing & documentation
 - [x] M8: Plugin bootstrap refactoring — global scope entry point, centralised hooks, remove singleton
 - [x] M9: Manager template refactoring — code-first conversion + `$auto_multi_meta_` variable prefixes for term-manager.php and post-manager.php
-- [x] M10: Settings page template refactoring — code-first conversion + `$auto_multi_meta_` variable prefixes for settings-page.php
+- [x] M10: Settings page template refactoring
+- [x] M11: WP-CLI commands — status, list, generate for terms and posts — code-first conversion + `$auto_multi_meta_` variable prefixes for settings-page.php
 
 ---
 
@@ -348,6 +349,76 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - Form submission and save still works correctly — pending manual test
 
 **Completed:** 2026-03-26
+
+---
+
+### M11: WP-CLI Commands ✅ (100%)
+
+**Goal:** Provide WP-CLI commands for listing term/post meta description status and generating descriptions from the command line, without needing the admin UI.
+
+**Files to create:**
+- `includes/class-cli.php` — WP-CLI command class with all subcommands
+
+**Files to update:**
+- `auto-multi-meta.php` — Conditionally require CLI class when `WP_CLI` is defined
+- `includes/class-plugin.php` — Register CLI commands (or register at file level in class-cli.php)
+
+**Commands:**
+
+```
+wp amm status                          — Show plugin config (provider, model, SEO plugin, enabled taxonomies/post types)
+wp amm list terms [--taxonomy=<slug>]  — List terms with meta description status (has/missing)
+wp amm list posts [--post-type=<slug>] — List posts with meta description status (has/missing)
+wp amm generate term <term_id>         — Generate meta description for a single term
+wp amm generate post <post_id>         — Generate meta description for a single post
+wp amm generate terms [--taxonomy=<slug>] [--force] [--missing-only] — Generate for all terms in a taxonomy (or all enabled)
+wp amm generate posts [--post-type=<slug>] [--force] [--missing-only] — Generate for all posts in a post type (or all enabled)
+```
+
+**Tasks:**
+
+_Scaffolding:_
+- [ ] Create `includes/class-cli.php` with `Auto_Multi_Meta\CLI` class
+- [ ] Conditionally require and register CLI commands when `WP_CLI` is defined
+- [ ] Add `class-cli.php` to the require list in `auto-multi-meta.php`
+
+_Status command:_
+- [ ] `wp amm status` — display provider, model, detected SEO plugin, enabled taxonomies, enabled post types, site language setting
+
+_List commands:_
+- [ ] `wp amm list terms` — table output: term ID, name, taxonomy, description status (has/missing), character count
+- [ ] `wp amm list terms --taxonomy=<slug>` — filter to a single taxonomy
+- [ ] `wp amm list posts` — table output: post ID, title, post type, description status, character count
+- [ ] `wp amm list posts --post-type=<slug>` — filter to a single post type
+- [ ] Support `--format=table|csv|json` via WP-CLI formatter
+- [ ] Support `--status=missing|has|all` filter for both list commands
+
+_Single generate commands:_
+- [ ] `wp amm generate term <term_id>` — generate for one term, output result
+- [ ] `wp amm generate post <post_id>` — generate for one post, output result
+- [ ] Support `--force` flag to overwrite existing descriptions
+- [ ] Support `--dry-run` flag to preview without saving
+
+_Bulk generate commands:_
+- [ ] `wp amm generate terms` — generate for all terms in all enabled taxonomies (missing only by default)
+- [ ] `wp amm generate terms --taxonomy=<slug>` — limit to one taxonomy
+- [ ] `wp amm generate posts` — generate for all posts in all enabled post types (missing only by default)
+- [ ] `wp amm generate posts --post-type=<slug>` — limit to one post type
+- [ ] Support `--force` flag to regenerate all (not just missing)
+- [ ] Progress bar via `\WP_CLI\Utils\make_progress_bar()`
+- [ ] Configurable delay between API calls via `--delay=<seconds>` (default: use saved batch delay setting)
+- [ ] Summary output on completion: generated, skipped, errors
+
+_Quality:_
+- [ ] Run phpcs/phpcbf, fix all violations
+- [ ] Test all commands on dev site
+
+**Completion criteria:**
+- All commands functional and producing correct output
+- Progress bar shown during bulk generation
+- `--format`, `--force`, `--dry-run`, `--status`, `--delay` flags work as documented
+- phpcs passes clean
+- Commands tested on dev site with real API calls
 
 ---
 

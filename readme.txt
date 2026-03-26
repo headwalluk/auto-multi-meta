@@ -4,7 +4,7 @@ Tags: seo, meta description, ai, openai, anthropic
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,13 @@ The Batch tab queues all items missing descriptions and processes them in the ba
 4. Activity log tab
 
 == Changelog ==
+
+= 0.4.0 =
+* Added WP-CLI commands: wp amm status, list, generate (single and bulk)
+* Added site language setting to append locale-aware spelling instructions to prompts
+* Added AI response cleaning to strip markdown artifacts from model output
+* Improved default prompt templates with explicit plain-text-only instructions
+* Added GitHub Actions release workflow
 
 = 0.3.0 =
 * Added The SEO Framework (TSF) support for post and term meta descriptions

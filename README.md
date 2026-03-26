@@ -3,18 +3,20 @@
 ![WordPress](https://img.shields.io/badge/WordPress-6.4%2B-blue)
 ![PHP](https://img.shields.io/badge/PHP-8.0%2B-purple)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Version](https://img.shields.io/badge/Version-0.3.0-orange)
+![Version](https://img.shields.io/badge/Version-0.4.0-orange)
 
-AI-generated SEO meta descriptions for taxonomy terms and posts. Supports OpenAI, Anthropic, and OpenRouter. Integrates with Yoast SEO and RankMath.
+AI-generated SEO meta descriptions for taxonomy terms and posts. Supports OpenAI, Anthropic, and OpenRouter. Integrates with Yoast SEO, RankMath, and The SEO Framework.
 
 ## Features
 
 - Meta descriptions for **taxonomy terms** and **posts/pages/custom post types**
 - **OpenAI**, **Anthropic**, and **OpenRouter** providers
-- Auto-detects **Yoast SEO** or **RankMath** for correct meta key storage
+- Auto-detects **Yoast SEO**, **RankMath**, or **The SEO Framework** for correct meta key storage
 - Dry-run **preview** before saving
 - **Background batch processing** via Action Scheduler or WP-Cron
+- **WP-CLI commands** for listing, generating, and bulk processing from the terminal
 - Configurable **prompt templates** with token replacement
+- **Site language awareness** — appends spelling instructions to prompts based on WordPress locale
 - Overwrite protection and activity logging
 
 ## Quick Start
@@ -29,13 +31,14 @@ AI-generated SEO meta descriptions for taxonomy terms and posts. Supports OpenAI
 
 - [Configuration](docs/configuration.md) — providers, prompt templates, SEO plugin integration
 - [Usage](docs/usage.md) — generating descriptions, bulk processing, activity log
+- [WP-CLI](docs/wp-cli.md) — command reference for `wp amm status`, `list`, and `generate`
 - [Changelog](CHANGELOG.md)
 
 ## Requirements
 
 - WordPress 6.4+
 - PHP 8.0+
-- Yoast SEO or RankMath
+- Yoast SEO, RankMath, or The SEO Framework
 - API key for OpenAI, Anthropic, or OpenRouter
 
 ## License
