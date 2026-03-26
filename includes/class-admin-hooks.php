@@ -64,6 +64,7 @@ class Admin_Hooks {
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_notices', [ $this, 'display_batch_notice' ] );
+		add_action( 'admin_notices', [ $this, 'display_setup_notices' ] );
 		add_action( 'wp_ajax_amm_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_amm_generate_single', [ $this, 'ajax_generate_single' ] );
 		add_action( 'wp_ajax_amm_generate_bulk', [ $this, 'ajax_generate_bulk' ] );
@@ -514,6 +515,57 @@ class Admin_Hooks {
 				(int) $failed
 			)
 		);
+	}
+
+	/**
+	 * Admin notice: shows setup warnings on plugin pages when configuration is incomplete.
+	 *
+	 * Checks for missing API key and no active SEO plugin. Notices are only shown
+	 * on the plugin's own admin pages so they are not shown site-wide.
+	 *
+	 * @return void
+	 */
+	public function display_setup_notices(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Only display on the plugin's own admin pages.
+		$screen = get_current_screen();
+
+		if ( ! $screen ) {
+			return;
+		}
+
+		$plugin_screens = [ $this->page_hook, $this->term_manager_hook, $this->post_manager_hook ];
+
+		if ( ! in_array( $screen->id, $plugin_screens, true ) ) {
+			return;
+		}
+
+		$settings_url = admin_url( 'tools.php?page=auto-multi-meta#settings' );
+		$api_key      = (string) get_option( AMM_OPT_API_KEY, '' );
+
+		if ( '' === $api_key ) {
+			printf(
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				sprintf(
+					/* translators: 1: Opening anchor tag. 2: Closing anchor tag. */
+					esc_html__( 'Auto Multi-Meta: No API key is configured. %1$sAdd your API key in Settings%2$s to start generating meta descriptions.', 'auto-multi-meta' ),
+					'<a href="' . esc_url( $settings_url ) . '">',
+					'</a>'
+				)
+			);
+		}
+
+		$seo_plugin = $this->plugin->detect_seo_plugin();
+
+		if ( 'none' === $seo_plugin ) {
+			printf(
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				esc_html__( 'Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO or RankMath). Meta descriptions cannot be stored without an active SEO plugin.', 'auto-multi-meta' )
+			);
+		}
 	}
 
 	/**

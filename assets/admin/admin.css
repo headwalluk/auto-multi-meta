@@ -265,3 +265,62 @@
 	font-size: 13px;
 	color: #50575e;
 }
+
+/* ===================================================================
+   Activity Log Table
+   =================================================================== */
+
+.amm-log-table {
+	table-layout: fixed;
+}
+
+.amm-log-table .column-timestamp {
+	width: 160px;
+}
+
+.amm-log-table .column-type,
+.amm-log-table .column-id,
+.amm-log-table .column-provider {
+	width: 100px;
+}
+
+.amm-log-table .column-status {
+	width: 90px;
+}
+
+.amm-log-table .column-model {
+	width: 160px;
+}
+
+.amm-log-table .column-model code {
+	font-size: 11px;
+	word-break: break-all;
+}
+
+.amm-status-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.amm-status-ok {
+	background: #edfaef;
+	color: #1a6b2a;
+	border: 1px solid #b3d7b9;
+}
+
+.amm-status-error {
+	background: #fce9e9;
+	color: #8b1a1a;
+	border: 1px solid #e0b3b3;
+}
+
+.amm-status-skip {
+	background: #f6f7f7;
+	color: #50575e;
+	border: 1px solid #c3c4c7;
+}

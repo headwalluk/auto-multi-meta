@@ -27,6 +27,7 @@ $prompt_terms       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_TERMS, AMM_DE
 $prompt_posts       = (string) get_option( AMM_OPT_PROMPT_TEMPLATE_POSTS, AMM_DEFAULT_PROMPT_TEMPLATE_POSTS );
 $overwrite          = (bool) get_option( AMM_OPT_OVERWRITE_EXISTING, AMM_DEFAULT_OVERWRITE_EXISTING );
 $batch_delay        = (int) get_option( AMM_OPT_BATCH_DELAY, AMM_DEFAULT_BATCH_DELAY );
+$generation_log     = (array) get_option( AMM_OPT_GENERATION_LOG, [] );
 
 $seo_labels = [
 	'yoast'    => __( 'Yoast SEO', 'auto-multi-meta' ),
@@ -361,9 +362,72 @@ $display_taxonomies  = array_filter(
 			<!-- ===== Log Tab ===== -->
 			<div id="log-panel" class="amm-tab-panel" style="display:none;">
 				<h2><?php esc_html_e( 'Activity Log', 'auto-multi-meta' ); ?></h2>
+
+				<?php if ( empty( $generation_log ) ) : ?>
 				<p class="description">
-					<?php esc_html_e( 'Generation history and activity log will appear here in a future release.', 'auto-multi-meta' ); ?>
+					<?php esc_html_e( 'No generation activity yet. Activity will appear here once you start generating meta descriptions.', 'auto-multi-meta' ); ?>
 				</p>
+				<?php else : ?>
+				<p class="description">
+					<?php
+					printf(
+						/* translators: %d: number of log entries shown. */
+						esc_html__( 'Showing %d most recent generation attempts (newest first).', 'auto-multi-meta' ),
+						count( $generation_log )
+					);
+					?>
+				</p>
+				<table class="wp-list-table widefat fixed striped amm-log-table">
+					<thead>
+						<tr>
+							<th class="column-timestamp"><?php esc_html_e( 'Date / Time', 'auto-multi-meta' ); ?></th>
+							<th class="column-type"><?php esc_html_e( 'Type', 'auto-multi-meta' ); ?></th>
+							<th class="column-id"><?php esc_html_e( 'ID', 'auto-multi-meta' ); ?></th>
+							<th class="column-provider"><?php esc_html_e( 'Provider', 'auto-multi-meta' ); ?></th>
+							<th class="column-model"><?php esc_html_e( 'Model', 'auto-multi-meta' ); ?></th>
+							<th class="column-status"><?php esc_html_e( 'Status', 'auto-multi-meta' ); ?></th>
+							<th class="column-message"><?php esc_html_e( 'Message', 'auto-multi-meta' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $generation_log as $amm_entry ) : ?>
+							<?php
+							$amm_e_type     = isset( $amm_entry['type'] ) ? sanitize_key( $amm_entry['type'] ) : '';
+							$amm_e_id       = isset( $amm_entry['id'] ) ? (int) $amm_entry['id'] : 0;
+							$amm_e_taxonomy = isset( $amm_entry['taxonomy'] ) ? sanitize_key( $amm_entry['taxonomy'] ) : '';
+							$amm_e_provider = isset( $amm_entry['provider'] ) ? sanitize_key( $amm_entry['provider'] ) : '';
+							$amm_e_model    = isset( $amm_entry['model'] ) ? sanitize_text_field( $amm_entry['model'] ) : '';
+							$amm_e_status   = isset( $amm_entry['status'] ) ? sanitize_key( $amm_entry['status'] ) : '';
+							$amm_e_message  = isset( $amm_entry['message'] ) ? sanitize_text_field( $amm_entry['message'] ) : '';
+							$amm_e_ts       = isset( $amm_entry['timestamp'] ) ? sanitize_text_field( $amm_entry['timestamp'] ) : '';
+
+							$amm_status_class = 'generated' === $amm_e_status ? 'amm-status-ok' : ( 'error' === $amm_e_status ? 'amm-status-error' : 'amm-status-skip' );
+							$amm_type_label   = 'term' === $amm_e_type && '' !== $amm_e_taxonomy
+							? 'term (' . $amm_e_taxonomy . ')'
+							: $amm_e_type;
+							?>
+						<tr>
+							<td><?php echo esc_html( $amm_e_ts ); ?></td>
+							<td><?php echo esc_html( $amm_type_label ); ?></td>
+							<td><?php echo esc_html( (string) $amm_e_id ); ?></td>
+							<td><?php echo esc_html( $amm_e_provider ); ?></td>
+							<td><code><?php echo esc_html( $amm_e_model ); ?></code></td>
+							<td>
+								<?php
+								printf(
+									'<span class="amm-status-badge %s">%s</span>',
+									esc_attr( $amm_status_class ),
+									esc_html( $amm_e_status )
+								);
+								?>
+							</td>
+							<td><?php echo esc_html( $amm_e_message ); ?></td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<?php endif; ?>
+
 			</div><!-- #log-panel -->
 
 			<!-- ===== Batch Tab ===== -->
