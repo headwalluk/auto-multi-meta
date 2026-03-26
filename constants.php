@@ -46,6 +46,15 @@ define(
 // HTTP timeout (seconds) for outbound AI API requests.
 define( 'AMM_HTTP_TIMEOUT', 30 );
 
+// Context builder — maximum chars of post content to include in context.
+define( 'AMM_CONTEXT_MAX_CONTENT_CHARS', 500 );
+
+// Context builder — maximum number of sample post/product titles to include for a term.
+define( 'AMM_CONTEXT_MAX_SAMPLE_TITLES', 10 );
+
+// Context builder — HTTP timeout (seconds) for loopback frontend fetch.
+define( 'AMM_CONTEXT_LOOPBACK_TIMEOUT', 5 );
+
 // SEO plugin meta keys — terms.
 define( 'AMM_YOAST_TERM_META_KEY', 'wpseo_desc' );
 define( 'AMM_RANKMATH_TERM_META_KEY', 'rank_math_description' );
