@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0-dev
 **Last Updated:** 2026-03-26
-**Current Phase:** Milestone 3 (Content Context Gathering)
-**Overall Progress:** 28% (2/7 milestones complete — M1 ✅, M2 ✅)
+**Current Phase:** Milestone 4 (Meta Description Generation & Storage)
+**Overall Progress:** 43% (3/7 milestones complete — M1 ✅, M2 ✅, M3 ✅)
 
 ---
 
@@ -34,6 +34,7 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 - [x] M2: Define AI_Provider interface
 - [x] M2: Implement OpenAI, Anthropic, OpenRouter providers
 - [x] M2: AI_Factory, Test Connection AJAX endpoint
+- [x] M3: Context_Builder with term/post context, loopback HTML fallback, prompt token replacement
 
 ---
 
@@ -117,27 +118,29 @@ Auto Multi-Meta is a WordPress plugin that automatically generates SEO meta desc
 
 ---
 
-### M3: Content Context Gathering ⬜ (0%)
+### M3: Content Context Gathering ✅ (100%)
 
 **Goal:** Build the context strings that get sent to the AI — for both taxonomy terms and posts.
 
-**Files to create:**
+**Files created:**
 - `includes/class-context-builder.php` — Gathers context for terms and posts
 
 **Tasks:**
-- [ ] Term context: term name, slug, existing description, taxonomy label, sample of posts/products in that term (up to 10 titles via WP_Query)
-- [ ] Post context: post title, excerpt (if set), first 500 chars of content (strip HTML), categories, tags
-- [ ] Fallback: if loopback `wp_remote_get()` works, use page title + meta description + H1/H2 from frontend HTML; if blocked, use WP_Query approach (default)
-- [ ] Build prompt from template: replace `{term_name}`, `{term_slug}`, `{taxonomy}`, `{product_list}`, `{post_title}`, `{post_excerpt}`, `{post_content}`, `{categories}`, `{tags}` tokens
-- [ ] Include sensible default prompt templates in constants.php (one for terms, one for posts)
-- [ ] Run phpcs/phpcbf, fix all violations
-- [ ] Git commit: `feat: context builder for taxonomy terms and posts`
+- [x] Term context: term name, slug, existing description, taxonomy label, sample of posts/products in that term (up to 10 titles via WP_Query)
+- [x] Post context: post title, excerpt (if set), first 500 chars of content (strip HTML), categories, tags
+- [x] Fallback: if loopback `wp_remote_get()` works, use page title + meta description + H1/H2 from frontend HTML; if blocked, use WP_Query approach (default)
+- [x] Build prompt from template: replace `{term_name}`, `{term_slug}`, `{taxonomy}`, `{product_list}`, `{post_title}`, `{post_excerpt}`, `{post_content}`, `{categories}`, `{tags}` tokens
+- [x] Include sensible default prompt templates in constants.php (one for terms, one for posts)
+- [x] Run phpcs/phpcbf, fix all violations
+- [x] Git commit: `feat: context builder for taxonomy terms and posts`
 
 **Completion criteria:**
-- Can generate a context string for any taxonomy term on the site
-- Can generate a context string for any post/page/product
-- Prompt template token replacement works correctly
-- phpcs passes clean
+- ✅ Can generate a context string for any taxonomy term on the site
+- ✅ Can generate a context string for any post/page/product — loopback working, HTML context merged in
+- ✅ Prompt template token replacement works correctly
+- ✅ phpcs passes clean
+
+**Completed:** 2026-03-26 — All criteria met. Loopback active on westfield.local (page_title, existing_meta, headings included in context). Fix applied: missing require_once in main plugin file.
 
 ---
 
