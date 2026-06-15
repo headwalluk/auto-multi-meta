@@ -1,0 +1,747 @@
+# Copyright (C) 2026 Paul Faulkner
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Language: fr_FR\n"
+"Project-Id-Version: Auto Multi-Meta 0.4.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/auto-multi-meta\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-06-15T17:37:29+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: auto-multi-meta\n"
+
+#. Plugin Name of the plugin
+#: auto-multi-meta.php
+#: includes/class-admin-hooks.php:48
+#: includes/class-admin-hooks.php:49
+msgid "Auto Multi-Meta"
+msgstr "Auto Multi-Meta"
+
+#. Plugin URI of the plugin
+#: auto-multi-meta.php
+msgid "https://headwall-hosting.com/"
+msgstr "https://headwall-hosting.com/"
+
+#. Description of the plugin
+#: auto-multi-meta.php
+msgid "Automatically generates SEO meta descriptions for taxonomy term archives and post types using AI (OpenAI, Anthropic, OpenRouter)."
+msgstr "Génère automatiquement des méta-descriptions optimisées pour le référencement naturel (SEO) pour les archives de termes de taxonomie et les types de publications à l'aide de l'IA (OpenAI, Anthropic, OpenRouter)."
+
+#. Author of the plugin
+#: auto-multi-meta.php
+msgid "Paul Faulkner"
+msgstr "Paul Faulkner"
+
+#. Author URI of the plugin
+#: auto-multi-meta.php
+msgid "https://headwall-hositng.com/"
+msgstr "https://headwall-hositng.com/"
+
+#: admin-templates/post-manager.php:56
+msgid "Post Manager"
+msgstr "Gestionnaire de publications"
+
+#: admin-templates/post-manager.php:63
+msgid "Switch to Term Manager"
+msgstr "Passer au Gestionnaire de termes"
+
+#: admin-templates/post-manager.php:68
+#: admin-templates/term-manager.php:49
+msgid "← Settings"
+msgstr "← Paramètres"
+
+#: admin-templates/post-manager.php:75
+msgid "Browse posts, pages, and custom post types — check meta description status, generate, or preview descriptions."
+msgstr "Parcourez les articles, les pages et les types de publications personnalisés — vérifiez l'état des méta-descriptions, générez-en ou prévisualisez-les."
+
+#. translators: %s: URL to settings page.
+#: admin-templates/post-manager.php:86
+#, php-format
+msgid "No post types are enabled. <a href=\"%s\">Enable post types on the Settings page</a> first."
+msgstr "Aucun type de publication n'est activé. <a href=\"%s\">Activez d'abord les types de publication sur la page Paramètres</a>."
+
+#: admin-templates/post-manager.php:106
+msgid "Filter by post type:"
+msgstr "Filtrer par type d'article :"
+
+#: admin-templates/post-manager.php:111
+msgid "— All Enabled Post Types —"
+msgstr "— Tous les types de publication activés —"
+
+#: admin-templates/post-manager.php:126
+#: admin-templates/term-manager.php:107
+msgid "Filter"
+msgstr "Filtre"
+
+#: admin-templates/post-manager.php:136
+#: admin-templates/term-manager.php:117
+#: includes/class-admin-hooks.php:115
+#: includes/class-post-manager.php:275
+#: includes/class-term-manager.php:258
+msgid "Preview"
+msgstr "Aperçu"
+
+#: admin-templates/post-manager.php:141
+#: admin-templates/term-manager.php:122
+msgid "Save This Description"
+msgstr "Enregistrer cette description"
+
+#: admin-templates/post-manager.php:145
+#: admin-templates/term-manager.php:126
+msgid "Dismiss"
+msgstr "Ignorer"
+
+#: admin-templates/post-manager.php:156
+#: admin-templates/settings-page.php:429
+#: admin-templates/settings-page.php:445
+#: admin-templates/term-manager.php:137
+msgid "Generate All Missing"
+msgstr "Générer toutes les données manquantes"
+
+#: admin-templates/post-manager.php:160
+#: admin-templates/settings-page.php:449
+#: admin-templates/term-manager.php:141
+msgid "Cancel Batch"
+msgstr "Annuler le lot"
+
+#: admin-templates/settings-page.php:30
+msgid "Yoast SEO"
+msgstr "Yoast SEO"
+
+#: admin-templates/settings-page.php:31
+msgid "RankMath"
+msgstr "RankMath"
+
+#: admin-templates/settings-page.php:32
+msgid "The SEO Framework"
+msgstr "Le cadre SEO"
+
+#: admin-templates/settings-page.php:33
+msgid "None detected"
+msgstr "Aucun détecté"
+
+#: admin-templates/settings-page.php:37
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: admin-templates/settings-page.php:38
+msgid "Anthropic"
+msgstr "Anthropique"
+
+#: admin-templates/settings-page.php:39
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: admin-templates/settings-page.php:67
+msgid "Settings tabs"
+msgstr "Onglets « Paramètres »"
+
+#: admin-templates/settings-page.php:69
+msgid "Settings"
+msgstr "Paramètres"
+
+#: admin-templates/settings-page.php:70
+msgid "Taxonomies"
+msgstr "Taxonomies"
+
+#: admin-templates/settings-page.php:71
+msgid "Post Types"
+msgstr "Types de publications"
+
+#: admin-templates/settings-page.php:72
+msgid "Log"
+msgstr "Journal"
+
+#: admin-templates/settings-page.php:73
+msgid "Batch"
+msgstr "Lot"
+
+#. translators: %s: SEO plugin name.
+#: admin-templates/settings-page.php:90
+#, php-format
+msgid "SEO plugin detected: %s. Meta descriptions will be written to the correct meta keys automatically."
+msgstr "Plugin SEO détecté : %s. Les méta-descriptions seront automatiquement générées pour les balises meta appropriées."
+
+#: admin-templates/settings-page.php:97
+msgid "No supported SEO plugin detected (Yoast SEO, RankMath, or The SEO Framework). Meta descriptions cannot be stored without an active SEO plugin."
+msgstr "Aucun plugin SEO pris en charge n'a été détecté (Yoast SEO, RankMath ou The SEO Framework). Les méta-descriptions ne peuvent pas être enregistrées sans plugin SEO actif."
+
+#: admin-templates/settings-page.php:102
+msgid "AI Provider"
+msgstr "Fournisseur d'IA"
+
+#: admin-templates/settings-page.php:107
+#: admin-templates/settings-page.php:363
+msgid "Provider"
+msgstr "Fournisseur"
+
+#: admin-templates/settings-page.php:119
+msgid "Select which AI service to use for generating meta descriptions."
+msgstr "Choisissez le service d'IA que vous souhaitez utiliser pour générer des méta-descriptions."
+
+#: admin-templates/settings-page.php:124
+msgid "API Key"
+msgstr "Clé API"
+
+#: admin-templates/settings-page.php:131
+msgid "Your API key. Leave blank to keep the existing saved key."
+msgstr "Votre clé API. Laissez ce champ vide pour conserver la clé enregistrée."
+
+#: admin-templates/settings-page.php:136
+#: admin-templates/settings-page.php:364
+msgid "Model"
+msgstr "Modèle"
+
+#: admin-templates/settings-page.php:143
+msgid "Model name to use. Examples: gpt-4o-mini, claude-3-haiku-20240307, openai/gpt-4o-mini."
+msgstr "Nom du modèle à utiliser. Exemples : gpt-4o-mini, claude-3-haiku-20240307, openai/gpt-4o-mini."
+
+#: admin-templates/settings-page.php:148
+msgid "Max Tokens"
+msgstr "Nombre maximal de jetons"
+
+#: admin-templates/settings-page.php:155
+msgid "Maximum tokens for the AI response (50–4096). Default: 300."
+msgstr "Nombre maximal de caractères pour la réponse de l'IA (50 à 4 096). Valeur par défaut : 300."
+
+#: admin-templates/settings-page.php:164
+msgid "Test Connection"
+msgstr "Tester la connexion"
+
+#: admin-templates/settings-page.php:170
+msgid "Prompt Templates"
+msgstr "Modèles de suggestions"
+
+#. translators: Placeholder token list.
+#: admin-templates/settings-page.php:175
+#, php-format
+msgid "Use tokens in your prompts: %s"
+msgstr "Utilisez des balises dans vos invites : %s"
+
+#: admin-templates/settings-page.php:184
+msgid "Taxonomy Terms Prompt"
+msgstr "Suggestion de termes taxonomiques"
+
+#: admin-templates/settings-page.php:195
+msgid "Posts / Pages Prompt"
+msgstr "Suggestions pour les articles / pages"
+
+#: admin-templates/settings-page.php:205
+msgid "Overwrite Existing"
+msgstr "Remplacer les fichiers existants"
+
+#: admin-templates/settings-page.php:210
+msgid "Regenerate descriptions for items that already have one."
+msgstr "Recréer les descriptions des articles qui en possèdent déjà une."
+
+#: admin-templates/settings-page.php:224
+msgid "Site Language"
+msgstr "Langue du site"
+
+#. translators: %s: Language name e.g. "British English" or "Portuguese (Brazil)".
+#: admin-templates/settings-page.php:231
+#, php-format
+msgid "Use %s spelling in generated meta descriptions."
+msgstr "Utiliser l'orthographe de %s dans les méta-descriptions générées."
+
+#: admin-templates/settings-page.php:242
+msgid "Enabled Taxonomies"
+msgstr "Taxonomies activées"
+
+#: admin-templates/settings-page.php:245
+msgid "Select the taxonomies for which Auto Multi-Meta will generate meta descriptions on archive pages."
+msgstr "Sélectionnez les taxonomies pour lesquelles Auto Multi-Meta générera des méta-descriptions sur les pages d'archives."
+
+#: admin-templates/settings-page.php:250
+msgid "Open Term Manager →"
+msgstr "Ouvrez le Gestionnaire de sessions →"
+
+#: admin-templates/settings-page.php:257
+msgid "No public taxonomies found."
+msgstr "Aucune taxonomie publique n'a été trouvée."
+
+#: admin-templates/settings-page.php:262
+#: admin-templates/settings-page.php:308
+msgid "Check All"
+msgstr "Tout sélectionner"
+
+#: admin-templates/settings-page.php:266
+#: admin-templates/settings-page.php:312
+msgid "Uncheck All"
+msgstr "Tout décocher"
+
+#: admin-templates/settings-page.php:288
+msgid "Enabled Post Types"
+msgstr "Types de publications activés"
+
+#: admin-templates/settings-page.php:291
+msgid "Select the post types for which Auto Multi-Meta will generate meta descriptions."
+msgstr "Sélectionnez les types de publications pour lesquels Auto Multi-Meta générera des méta-descriptions."
+
+#: admin-templates/settings-page.php:296
+msgid "Open Post Manager →"
+msgstr "Ouvrez le Gestionnaire de publications →"
+
+#: admin-templates/settings-page.php:303
+msgid "No public post types found."
+msgstr "Aucun type de publication publique n'a été trouvé."
+
+#: admin-templates/settings-page.php:334
+msgid "Activity Log"
+msgstr "Journal d'activité"
+
+#: admin-templates/settings-page.php:339
+msgid "Clear Log"
+msgstr "Effacer le journal"
+
+#: admin-templates/settings-page.php:346
+msgid "No generation activity yet. Activity will appear here once you start generating meta descriptions."
+msgstr "Aucune activité de génération pour l'instant. Les résultats s'afficheront ici dès que vous commencerez à générer des méta-descriptions."
+
+#. translators: %d: number of log entries shown.
+#: admin-templates/settings-page.php:353
+#, php-format
+msgid "Showing %d most recent generation attempts (newest first)."
+msgstr "Affichage des %d dernières tentatives de génération (les plus récentes en premier)."
+
+#: admin-templates/settings-page.php:360
+msgid "Date / Time"
+msgstr "Date / Heure"
+
+#: admin-templates/settings-page.php:361
+msgid "Type"
+msgstr "Type"
+
+#: admin-templates/settings-page.php:362
+msgid "ID"
+msgstr "Identité"
+
+#: admin-templates/settings-page.php:365
+#: includes/class-post-manager.php:82
+#: includes/class-term-manager.php:62
+msgid "Status"
+msgstr "Statut"
+
+#: admin-templates/settings-page.php:366
+msgid "Message"
+msgstr "Message"
+
+#: admin-templates/settings-page.php:406
+msgid "Background Batch Processing"
+msgstr "Traitement par lots en arrière-plan"
+
+#: admin-templates/settings-page.php:409
+msgid "Run a background job to generate meta descriptions for all items that are missing one. The job runs in the background via Action Scheduler (or WP-Cron as a fallback) — you can close this page and return later to check progress."
+msgstr "Lancez une tâche en arrière-plan pour générer des méta-descriptions pour tous les articles qui n'en ont pas. La tâche s'exécute en arrière-plan via Action Scheduler (ou WP-Cron à défaut) — vous pouvez fermer cette page et revenir plus tard pour vérifier l'avancement."
+
+#: admin-templates/settings-page.php:413
+msgid "Rate Limiting"
+msgstr "Limitation du débit"
+
+#: admin-templates/settings-page.php:416
+msgid "Delay Between Requests"
+msgstr "Intervalle entre les requêtes"
+
+#: admin-templates/settings-page.php:423
+msgid "seconds"
+msgstr "secondes"
+
+#: admin-templates/settings-page.php:424
+msgid "Pause between each AI API call to avoid rate limiting (0–60 seconds). Default: 5 seconds."
+msgstr "Pause entre chaque appel à l'API IA pour éviter la limitation de débit (0 à 60 secondes). Valeur par défaut : 5 secondes."
+
+#: admin-templates/settings-page.php:432
+msgid "Queues all enabled taxonomies and post types that are missing meta descriptions. Save your settings first if you have made changes above."
+msgstr "Affiche toutes les taxonomies et tous les types de publication activés qui ne comportent pas de méta-description. Enregistrez d'abord vos paramètres si vous avez apporté des modifications ci-dessus."
+
+#: admin-templates/settings-page.php:438
+msgid "Terms &amp; Posts"
+msgstr "Conditions générales et publications"
+
+#: admin-templates/settings-page.php:439
+msgid "Terms only"
+msgstr "Conditions générales"
+
+#: admin-templates/settings-page.php:440
+msgid "Posts only"
+msgstr "Messages uniquement"
+
+#: admin-templates/settings-page.php:464
+msgid "Save Settings"
+msgstr "Enregistrer les paramètres"
+
+#: admin-templates/term-manager.php:37
+msgid "Term Manager"
+msgstr "Gestionnaire de termes"
+
+#: admin-templates/term-manager.php:44
+msgid "Switch to Post Manager"
+msgstr "Passer au Gestionnaire de publications"
+
+#: admin-templates/term-manager.php:56
+msgid "Browse taxonomy terms, check their meta description status, and generate or preview descriptions."
+msgstr "Parcourez les termes de taxonomie, vérifiez l'état de leurs méta-descriptions et générez ou prévisualisez ces descriptions."
+
+#. translators: %s: URL to settings page.
+#: admin-templates/term-manager.php:67
+#, php-format
+msgid "No taxonomies are enabled. <a href=\"%s\">Enable taxonomies on the Settings page</a> first."
+msgstr "Aucune taxonomie n'est activée. <a href=\"%s\">Activez d'abord les taxonomies sur la page Paramètres</a>."
+
+#: admin-templates/term-manager.php:87
+msgid "Filter by taxonomy:"
+msgstr "Filtrer par taxonomie :"
+
+#: admin-templates/term-manager.php:92
+msgid "— All Enabled Taxonomies —"
+msgstr "— Toutes les taxonomies activées —"
+
+#: includes/class-admin-hooks.php:61
+msgid "Auto Multi-Meta — Term Manager"
+msgstr "Auto Multi-Meta — Gestionnaire de termes"
+
+#: includes/class-admin-hooks.php:73
+msgid "Auto Multi-Meta — Post Manager"
+msgstr "Auto Multi-Meta — Gestionnaire de publications"
+
+#: includes/class-admin-hooks.php:111
+msgid "Generating…"
+msgstr "Génération en cours…"
+
+#: includes/class-admin-hooks.php:112
+msgid "Previewing…"
+msgstr "Aperçu…"
+
+#: includes/class-admin-hooks.php:113
+#: includes/class-post-manager.php:264
+#: includes/class-term-manager.php:245
+msgid "Generate"
+msgstr "Générer"
+
+#: includes/class-admin-hooks.php:114
+#: includes/class-post-manager.php:263
+#: includes/class-term-manager.php:244
+msgid "Regenerate"
+msgstr "Régénérer"
+
+#. translators: %1$d: current item number, %2$d: total items.
+#: includes/class-admin-hooks.php:117
+#, php-format
+msgid "Generating %1$d of %2$d…"
+msgstr "Génération de %1$d sur %2$d…"
+
+#. translators: %1$d: generated count, %2$d: skipped count, %3$d: error count.
+#: includes/class-admin-hooks.php:119
+#, php-format
+msgid "%1$d generated, %2$d skipped, %3$d errors."
+msgstr "%1$d générés, %2$d ignorés, %3$d erreurs."
+
+#: includes/class-admin-hooks.php:120
+msgid "Request failed. Please try again."
+msgstr "La requête a échoué. Veuillez réessayer."
+
+#: includes/class-admin-hooks.php:121
+msgid "Starting…"
+msgstr "C'est parti…"
+
+#. translators: %1$d: completed count, %2$d: total, %3$d: failed count.
+#: includes/class-admin-hooks.php:123
+#, php-format
+msgid "Processing %1$d of %2$d… (%3$d failed)"
+msgstr "Traitement de %1$d sur %2$d… (%3$d ont échoué)"
+
+#. translators: %1$d: generated count, %2$d: total, %3$d: failed count.
+#: includes/class-admin-hooks.php:125
+#, php-format
+msgid "Complete: %1$d of %2$d generated (%3$d failed)."
+msgstr "Terminé : %1$d sur %2$d générés (%3$d ont échoué)."
+
+#. translators: %1$d: completed count, %2$d: total items.
+#: includes/class-admin-hooks.php:127
+#, php-format
+msgid "Cancelled after processing %1$d of %2$d items."
+msgstr "Annulé après le traitement de %1$d des %2$d éléments."
+
+#: includes/class-admin-hooks.php:128
+msgid "Failed to start batch."
+msgstr "Échec du lancement du traitement par lots."
+
+#: includes/class-admin-hooks.php:129
+msgid "Cancelling…"
+msgstr "Annulation…"
+
+#: includes/class-admin-hooks.php:144
+#: includes/class-admin-hooks.php:161
+#: includes/class-admin-hooks.php:178
+msgid "You do not have permission to access this page."
+msgstr "Vous n'êtes pas autorisé à accéder à cette page."
+
+#: includes/class-admin-hooks.php:200
+#: includes/class-admin-hooks.php:249
+#: includes/class-admin-hooks.php:322
+#: includes/class-admin-hooks.php:368
+#: includes/class-admin-hooks.php:400
+#: includes/class-admin-hooks.php:418
+#: includes/class-admin-hooks.php:541
+#: includes/class-admin-hooks.php:584
+msgid "Insufficient permissions."
+msgstr "Autorisations insuffisantes."
+
+#: includes/class-admin-hooks.php:211
+#: includes/class-admin-hooks.php:332
+msgid "Invalid item ID."
+msgstr "Identifiant d'élément non valide."
+
+#: includes/class-admin-hooks.php:219
+msgid "Taxonomy is required for term generation."
+msgstr "La taxonomie est nécessaire à la création de termes."
+
+#: includes/class-admin-hooks.php:226
+#: includes/class-admin-hooks.php:347
+msgid "Invalid type. Must be \"term\" or \"post\"."
+msgstr "Type non valide. Doit être « term » ou « post »."
+
+#: includes/class-admin-hooks.php:258
+msgid "No items selected."
+msgstr "Aucun article sélectionné."
+
+#: includes/class-admin-hooks.php:340
+msgid "Taxonomy is required for term preview."
+msgstr "La taxonomie est nécessaire pour l'aperçu des termes."
+
+#: includes/class-admin-hooks.php:453
+msgid "terms"
+msgstr "conditions"
+
+#: includes/class-admin-hooks.php:455
+msgid "posts"
+msgstr "articles"
+
+#: includes/class-admin-hooks.php:457
+msgid "items"
+msgstr "articles"
+
+#. translators: 1: generated count, 2: total count, 3: item type label, 4: failed count.
+#: includes/class-admin-hooks.php:467
+#, php-format
+msgid "Auto Multi-Meta batch complete: %1$d of %2$d %3$s generated. %4$d failed."
+msgstr "Traitement par lots Auto Multi-Meta terminé : %1$d sur %2$d %3$s générés. %4$d ont échoué."
+
+#. translators: 1: Opening anchor tag. 2: Closing anchor tag.
+#: includes/class-admin-hooks.php:510
+#, php-format
+msgid "Auto Multi-Meta: No API key is configured. %1$sAdd your API key in Settings%2$s to start generating meta descriptions."
+msgstr "Auto Multi-Meta : aucune clé API n'est configurée. %1$sAjoutez votre clé API dans les paramètres%2$s pour commencer à générer des méta-descriptions."
+
+#: includes/class-admin-hooks.php:522
+msgid "Auto Multi-Meta: No supported SEO plugin detected (Yoast SEO, RankMath, or The SEO Framework). Meta descriptions cannot be stored without an active SEO plugin."
+msgstr "Auto Multi-Meta : aucun plugin SEO pris en charge n'a été détecté (Yoast SEO, RankMath ou The SEO Framework). Les méta-descriptions ne peuvent pas être enregistrées sans plugin SEO actif."
+
+#. translators: 1: provider name, 2: model name, 3: AI response text.
+#: includes/class-admin-hooks.php:563
+#, php-format
+msgid "Connection successful. Provider: %1$s | Model: %2$s | Response: %3$s"
+msgstr "Connexion établie. Fournisseur : %1$s | Modèle : %2$s | Réponse : %3$s"
+
+#: includes/class-admin-hooks.php:588
+msgid "Activity log cleared."
+msgstr "Le journal des activités a été effacé."
+
+#: includes/class-ai-anthropic.php:73
+msgid "Failed to encode Anthropic request body."
+msgstr "Échec de l'encodage du corps de la requête Anthropic."
+
+#: includes/class-ai-anthropic.php:129
+msgid "Anthropic returned an empty or malformed response."
+msgstr "Anthropic a renvoyé une réponse vide ou mal formée."
+
+#: includes/class-ai-factory.php:40
+msgid "No API key configured. Please add your API key in the plugin settings."
+msgstr "Aucune clé API n'est configurée. Veuillez ajouter votre clé API dans les paramètres du plugin."
+
+#. translators: %s: Provider slug.
+#: includes/class-ai-factory.php:56
+#, php-format
+msgid "Unknown AI provider: %s"
+msgstr "Fournisseur d'IA inconnu : %s"
+
+#: includes/class-ai-openai.php:66
+msgid "Failed to encode OpenAI request body."
+msgstr "Échec de l'encodage du corps de la requête OpenAI."
+
+#: includes/class-ai-openrouter.php:67
+msgid "Failed to encode OpenRouter request body."
+msgstr "Échec de l'encodage du corps de la requête OpenRouter."
+
+#. translators: 1: Provider name. 2: Error message.
+#: includes/class-ai-provider.php:88
+#, php-format
+msgid "%1$s request failed: %2$s"
+msgstr "La requête %1$s a échoué : %2$s"
+
+#. translators: %s: Provider name.
+#: includes/class-ai-provider.php:103
+#, php-format
+msgid "%s API key is invalid or missing."
+msgstr "La clé API %s n'est pas valide ou est manquante."
+
+#. translators: 1: Provider name. 2: Retry-After value.
+#: includes/class-ai-provider.php:113
+#, php-format
+msgid "%1$s rate limit exceeded. Retry after: %2$s seconds."
+msgstr "La limite de %1$s a été dépassée. Réessayez dans %2$s secondes."
+
+#: includes/class-ai-provider.php:115
+msgid "unknown"
+msgstr "inconnu"
+
+#. translators: 1: Provider name. 2: Error detail.
+#: includes/class-ai-provider.php:128
+#, php-format
+msgid "%1$s API error: %2$s"
+msgstr "%1$s Erreur API : %2$s"
+
+#. translators: %s: Provider name.
+#: includes/class-ai-provider.php:161
+#, php-format
+msgid "%s returned an empty or malformed response."
+msgstr "%s a renvoyé une réponse vide ou incorrecte."
+
+#: includes/class-batch-processor.php:51
+msgid "No items found that need meta descriptions."
+msgstr "Aucun élément nécessitant une méta-description n'a été trouvé."
+
+#: includes/class-context-builder.php:44
+msgid "Term not found."
+msgstr "Terme introuvable."
+
+#: includes/class-context-builder.php:63
+msgid "no items currently listed"
+msgstr "Aucun article n'est actuellement répertorié"
+
+#: includes/class-context-builder.php:99
+msgid "Post not found."
+msgstr "Article introuvable."
+
+#: includes/class-generator.php:91
+msgid "Term already has a meta description. Use force to overwrite."
+msgstr "Le terme dispose déjà d'une méta-description. Utilisez la commande « force » pour la remplacer."
+
+#. translators: %d: Character count of the generated description.
+#: includes/class-generator.php:136
+#: includes/class-generator.php:231
+#, php-format
+msgid "Meta description generated and stored (%d characters)."
+msgstr "Méta-description générée et enregistrée (%d caractères)."
+
+#: includes/class-generator.php:186
+msgid "Post already has a meta description. Use force to overwrite."
+msgstr "L'article dispose déjà d'une méta-description. Utilisez la commande « force » pour la remplacer."
+
+#. translators: %d: Character count of the generated description.
+#: includes/class-generator.php:295
+#: includes/class-generator.php:355
+#, php-format
+msgid "Preview ready — %d characters. Not saved."
+msgstr "Aperçu prêt — %d caractères. Non enregistré."
+
+#. translators: 1: Character count. 2: Minimum length.
+#: includes/class-generator.php:411
+#, php-format
+msgid "Generated description is too short (%1$d characters, minimum %2$d)."
+msgstr "La description générée est trop courte (%1$d caractères, minimum %2$d)."
+
+#. translators: 1: Character count. 2: Maximum length.
+#: includes/class-generator.php:423
+#, php-format
+msgid "Generated description is too long (%1$d characters, maximum %2$d)."
+msgstr "La description générée est trop longue (%1$d caractères, maximum %2$d)."
+
+#: includes/class-meta-handler.php:125
+msgid "No supported SEO plugin detected. Cannot write term meta description."
+msgstr "Aucun plugin SEO compatible n'a été détecté. Impossible d'enregistrer la méta-description du terme."
+
+#: includes/class-meta-handler.php:155
+msgid "No supported SEO plugin detected. Cannot write post meta description."
+msgstr "Aucun plugin SEO compatible n'a été détecté. Impossible d'enregistrer la méta-description de l'article."
+
+#: includes/class-post-manager.php:79
+msgid "Title"
+msgstr "Titre"
+
+#: includes/class-post-manager.php:80
+msgid "Post Type"
+msgstr "Type de message"
+
+#: includes/class-post-manager.php:81
+#: includes/class-term-manager.php:61
+msgid "Meta Description"
+msgstr "Description méta"
+
+#: includes/class-post-manager.php:83
+#: includes/class-term-manager.php:63
+msgid "Actions"
+msgstr "Actions"
+
+#: includes/class-post-manager.php:109
+#: includes/class-term-manager.php:89
+msgid "Generate Missing Descriptions"
+msgstr "Générer les descriptions manquantes"
+
+#: includes/class-post-manager.php:191
+#: includes/class-term-manager.php:172
+msgid "(none)"
+msgstr "(aucun)"
+
+#: includes/class-post-manager.php:230
+#: includes/class-term-manager.php:211
+msgid "No meta description set"
+msgstr "Aucune méta-description définie"
+
+#: includes/class-post-manager.php:238
+#: includes/class-term-manager.php:219
+msgid "Good length (120–160 chars)"
+msgstr "Longueur appropriée (120 à 160 caractères)"
+
+#: includes/class-post-manager.php:243
+#: includes/class-term-manager.php:224
+msgid "Description exists but outside optimal length (120–160 chars)"
+msgstr "La description existe, mais sa longueur dépasse la limite recommandée (120 à 160 caractères)"
+
+#: includes/class-post-manager.php:285
+#: includes/class-term-manager.php:268
+msgid "View"
+msgstr "Afficher"
+
+#: includes/class-post-manager.php:333
+msgid "No post types are enabled. Enable post types on the Settings page."
+msgstr "Aucun type de publication n'est activé. Activez les types de publication sur la page Paramètres."
+
+#: includes/class-post-manager.php:335
+msgid "No posts found in the enabled post types."
+msgstr "Aucun article n'a été trouvé dans les types d'articles activés."
+
+#: includes/class-post-manager.php:391
+msgid "(no title)"
+msgstr "(sans titre)"
+
+#: includes/class-term-manager.php:59
+msgid "Term Name"
+msgstr "Nom du terme"
+
+#: includes/class-term-manager.php:60
+msgid "Taxonomy"
+msgstr "Taxonomie"
+
+#: includes/class-term-manager.php:317
+msgid "No taxonomies are enabled. Enable taxonomies on the Settings page."
+msgstr "Aucune taxonomie n'est activée. Activez les taxonomies sur la page Paramètres."
+
+#: includes/class-term-manager.php:319
+msgid "No terms found in the enabled taxonomies."
+msgstr "Aucun terme n'a été trouvé dans les taxonomies activées."

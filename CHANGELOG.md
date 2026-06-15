@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.4.2] — 2026-06-15
+
+### Added
+
+- Translations for German (de_DE), Greek (el_GR), British English (en_GB), Spanish (es_ES), French (fr_FR), Italian (it_IT), Dutch (nl_NL), and Polish (pl_PL), plus an updated `.pot` template
+
+### Changed
+
+- Default Posts/Pages prompt template now steers the AI toward factually describing the content rather than enticing the reader — it leads with the subject matter and explicitly avoids marketing/call-to-action openers such as "Explore", "Discover", and "Dive into". (Affects new installs and prompts left at their default; existing saved custom prompts are unchanged.)
+
+---
+
 ## [0.4.1] — 2026-03-26
 
 ### Fixed

@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die();
 // short-prefix detection behaviour (AMM = 3 chars), but the prefix is correctly applied.
 
 // Plugin metadata.
-define( 'AMM_VERSION', '0.4.1' );
+define( 'AMM_VERSION', '0.4.2' );
 define( 'AMM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AMM_URL', plugin_dir_url( __FILE__ ) );
 
@@ -42,7 +42,7 @@ define(
 );
 define(
 	'AMM_DEFAULT_PROMPT_TEMPLATE_POSTS',
-	'Write a concise SEO meta description (150-160 characters) for a {post_type} titled "{post_title}". Summary: {post_excerpt}. The description should be informative, include relevant keywords naturally, and encourage clicks from search results. Output ONLY the plain text description — no headings, labels, markdown, character counts, or quotes.'
+	'Write a concise SEO meta description (150-160 characters) for a {post_type} titled "{post_title}". Summary: {post_excerpt}. Describe what the content actually covers in a factual, informative tone, leading with the specific subject matter and including relevant keywords naturally. Do NOT open with marketing or call-to-action phrases such as "Explore", "Discover", "Learn", "Unlock", or "Dive into", and do not address the reader directly — summarise the content, do not advertise it. Output ONLY the plain text description — no headings, labels, markdown, character counts, or quotes.'
 );
 
 // HTTP timeout (seconds) for outbound AI API requests.
